@@ -1,9 +1,7 @@
 // ═══════════════════════════════════════════════════════════
-// PEELR — GAME LOGIC
-// Card display, swipe mechanics, session management
+// PEELR — GAME LOGIC (Updated with Switcher)
 // ═══════════════════════════════════════════════════════════
 
-// Game state
 let sessionQuestions = [];
 let currentQuestionIndex = 0;
 let questionsDrawn = 0;
@@ -16,20 +14,14 @@ const RECAP_QUOTES = [
   "The best conversations don't end. They pause."
 ];
 
-// Initialize game with deck and layer
 function initializeGame(deck, layer) {
   currentQuestionIndex = 0;
   questionsDrawn = 0;
-  
-  // Get questions for this deck/layer and shuffle
   const questions = QUESTIONS[deck][layer];
   sessionQuestions = shuffleArray([...questions]);
-  
-  // Show first card
   showCard();
 }
 
-// Shuffle array
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -38,7 +30,6 @@ function shuffleArray(array) {
   return array;
 }
 
-// Show current card
 function showCard() {
   const container = document.getElementById('card-container');
   const question = sessionQuestions[currentQuestionIndex];
@@ -63,12 +54,9 @@ function showCard() {
   
   container.innerHTML = '';
   container.appendChild(card);
-  
-  // Add swipe handlers
   setupSwipe(card);
 }
 
-// Setup swipe mechanics
 function setupSwipe(card) {
   let startX = 0;
   let currentX = 0;
@@ -96,16 +84,11 @@ function setupSwipe(card) {
     const diff = currentX - startX;
     
     if (Math.abs(diff) > 100) {
-      // Swipe complete
       card.style.transition = 'transform 200ms ease-out, opacity 200ms ease-out';
       card.style.transform = `translateX(${diff > 0 ? 1000 : -1000}px) rotate(${diff > 0 ? 45 : -45}deg)`;
       card.style.opacity = 0;
-      
-      setTimeout(() => {
-        nextCard();
-      }, 200);
+      setTimeout(() => nextCard(), 200);
     } else {
-      // Snap back
       card.style.transition = 'transform 200ms ease-out, opacity 200ms ease-out';
       card.style.transform = 'translateX(0) rotate(0)';
       card.style.opacity = 1;
@@ -118,31 +101,17 @@ function setupSwipe(card) {
   document.addEventListener('touchmove', handleMove, { passive: false });
   document.addEventListener('mouseup', handleEnd);
   document.addEventListener('touchend', handleEnd);
-  
-  // Cleanup on card removal
-  card._cleanup = () => {
-    card.removeEventListener('mousedown', handleStart);
-    card.removeEventListener('touchstart', handleStart);
-    document.removeEventListener('mousemove', handleMove);
-    document.removeEventListener('touchmove', handleMove);
-    document.removeEventListener('mouseup', handleEnd);
-    document.removeEventListener('touchend', handleEnd);
-  };
 }
 
-// Next card
 function nextCard() {
   questionsDrawn++;
   currentQuestionIndex++;
-  
   if (currentQuestionIndex >= sessionQuestions.length) {
-    currentQuestionIndex = 0; // Loop back to start
+    currentQuestionIndex = 0;
   }
-  
   showCard();
 }
 
-// Change layer mid-game
 function changeLayer(layer) {
   currentLayer = layer;
   currentQuestionIndex = 0;
@@ -151,7 +120,6 @@ function changeLayer(layer) {
   showCard();
 }
 
-// End session and show recap
 function endSession() {
   document.getElementById('recap-stats').textContent = 
     `You pulled ${questionsDrawn} draws · Layer ${currentLayer} · ${DECK_NAMES[currentDeck]}`;
@@ -160,7 +128,6 @@ function endSession() {
   showScreen('recap');
 }
 
-// Share question
 function shareQuestion() {
   const question = sessionQuestions[currentQuestionIndex];
   const text = `"${question}" — via Peelr. Pull your own draw at playpeelr.com`;
@@ -169,24 +136,18 @@ function shareQuestion() {
     navigator.share({
       title: 'Peelr',
       text: text
-    }).catch(() => {
-      // Fallback if share fails
-      copyToClipboard(text);
-    });
+    }).catch(() => copyToClipboard(text));
   } else {
-    // Fallback for browsers without Web Share API
     copyToClipboard(text);
   }
 }
 
-// Copy to clipboard helper
 function copyToClipboard(text) {
   if (navigator.clipboard) {
     navigator.clipboard.writeText(text).then(() => {
       alert('Question copied to clipboard!');
     });
   } else {
-    // Older fallback
     const textarea = document.createElement('textarea');
     textarea.value = text;
     textarea.style.position = 'fixed';
@@ -197,4 +158,54 @@ function copyToClipboard(text) {
     document.body.removeChild(textarea);
     alert('Question copied to clipboard!');
   }
+}
+
+// Deck/Layer Switcher
+function showSwitcher() {
+  const overlay = document.createElement('div');
+  overlay.className = 'switcher-overlay';
+  overlay.innerHTML = `
+    <div class="switcher-modal">
+      <h3>Switch Deck or Layer</h3>
+      <div class="switcher-section">
+        <label>Deck:</label>
+        <div class="deck-options">
+          ${Object.keys(DECK_NAMES).map(deck => `
+            <button class="deck-option ${deck === currentDeck ? 'active' : ''}" 
+                    onclick="switchDeck('${deck}')">${DECK_NAMES[deck]}</button>
+          `).join('')}
+        </div>
+      </div>
+      <div class="switcher-section">
+        <label>Layer:</label>
+        <div class="layer-options">
+          ${[1,2,3,4,5].map(layer => `
+            <button class="layer-option ${layer === currentLayer ? 'active' : ''}" 
+                    onclick="switchLayer(${layer})">${layer}</button>
+          `).join('')}
+        </div>
+      </div>
+      <button class="close-switcher" onclick="closeSwitcher()">Done</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeSwitcher();
+  });
+}
+
+function switchDeck(deck) {
+  currentDeck = deck;
+  document.documentElement.style.setProperty('--accent', DECK_COLORS[deck]);
+  document.getElementById('current-deck-name').textContent = DECK_NAMES[deck];
+  initializeGame(deck, currentLayer);
+}
+
+function switchLayer(layer) {
+  changeLayer(layer);
+}
+
+function closeSwitcher() {
+  const overlay = document.querySelector('.switcher-overlay');
+  if (overlay) overlay.remove();
 }
