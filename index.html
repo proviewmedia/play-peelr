@@ -1,306 +1,125 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="description" content="Peel back the person in front of you. A question card game for friends, family, lovers, coworkers, and strangers.">
-<meta name="theme-color" content="#0a0908">
-<title>Peelr — Conversation Card Game</title>
+Peelr
+✦ QUESTIONS UPDATED MONTHLY ✦
+Peel back the person in front of you.
+Play
+How to Play The Peel Settings Privacy & Legal
+←
+Peelr
 
-<!-- Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+Who are you playing with?
+Friends
+The people who know you
+Family
+The roots that shaped you
+Coworkers
+The people you build with
+Lovers
+The ones who see all of you
+Strangers
+The people you haven't met yet
+←
+Peelr
 
-<!-- Styles -->
-<link rel="stylesheet" href="styles.css">
-</head>
-<body>
+How deep do you want to go?
+1
+Surface
+Light, fun, easy to answer
+2
+Getting Warmer
+A little more personal
+3
+Going Deeper
+Emotions, thoughts, real experiences
+4
+Deep Dive
+Vulnerable and introspective
+5
+Soul Level
+Profound. Requires real honesty.
+←
 
-<!-- ═══════════════════════════════════════════════════════════
-     HOME SCREEN
-     ═══════════════════════════════════════════════════════════ -->
-<div id="home" class="screen active">
-  <div>
-    <div class="app-name">Peelr</div>
-    <div class="monthly-badge">✦ QUESTIONS UPDATED MONTHLY ✦</div>
-    <div class="tagline">Peel back the person in front of you.</div>
-  </div>
-  
-  <button class="play-button" onclick="showScreen('category-select')">Play</button>
-  
-  <nav class="bottom-nav">
-    <a onclick="showScreen('how-to-play')">How to Play</a>
-    <a onclick="showScreen('the-peel')">The Peel</a>
-    <a onclick="showScreen('settings')">Settings</a>
-    <a onclick="showScreen('privacy')">Privacy & Legal</a>
-  </nav>
-</div>
+⋮
 
-<!-- ═══════════════════════════════════════════════════════════
-     CATEGORY SELECT
-     ═══════════════════════════════════════════════════════════ -->
-<div id="category-select" class="screen">
-  <h1 class="screen-title">Who are you playing with?</h1>
-  <div class="deck-grid">
-    <div class="deck-card" style="--accent:var(--friends)" onclick="selectDeck('friends')">
-      <div class="deck-name">Friends</div>
-      <div class="deck-desc">The people who know you</div>
-    </div>
-    <div class="deck-card" style="--accent:var(--family)" onclick="selectDeck('family')">
-      <div class="deck-name">Family</div>
-      <div class="deck-desc">The roots that shaped you</div>
-    </div>
-    <div class="deck-card" style="--accent:var(--coworkers)" onclick="selectDeck('coworkers')">
-      <div class="deck-name">Coworkers</div>
-      <div class="deck-desc">The people you build with</div>
-    </div>
-    <div class="deck-card" style="--accent:var(--lovers)" onclick="selectDeck('lovers')">
-      <div class="deck-name">Lovers</div>
-      <div class="deck-desc">The ones who see all of you</div>
-    </div>
-    <div class="deck-card strangers" style="--accent:var(--strangers)" onclick="selectDeck('strangers')">
-      <div class="deck-name">Strangers</div>
-      <div class="deck-desc">The people you haven't met yet</div>
-    </div>
-  </div>
-</div>
+That was a Peel.
 
-<!-- ═══════════════════════════════════════════════════════════
-     LAYER SELECT
-     ═══════════════════════════════════════════════════════════ -->
-<div id="layer-select" class="screen">
-  <h1 class="screen-title">How deep do you want to go?</h1>
-  <div class="layer-list">
-    <div class="layer-row" onclick="startGame(1)">
-      <div class="layer-number">1</div>
-      <div class="layer-content">
-        <div class="layer-title">Surface</div>
-        <div class="layer-desc">Light, fun, easy to answer</div>
-      </div>
-    </div>
-    <div class="layer-row" onclick="startGame(2)">
-      <div class="layer-number">2</div>
-      <div class="layer-content">
-        <div class="layer-title">Getting Warmer</div>
-        <div class="layer-desc">A little more personal</div>
-      </div>
-    </div>
-    <div class="layer-row" onclick="startGame(3)">
-      <div class="layer-number">3</div>
-      <div class="layer-content">
-        <div class="layer-title">Going Deeper</div>
-        <div class="layer-desc">Emotions, thoughts, real experiences</div>
-      </div>
-    </div>
-    <div class="layer-row" onclick="startGame(4)">
-      <div class="layer-number">4</div>
-      <div class="layer-content">
-        <div class="layer-title">Deep Dive</div>
-        <div class="layer-desc">Vulnerable and introspective</div>
-      </div>
-    </div>
-    <div class="layer-row" onclick="startGame(5)">
-      <div class="layer-number">5</div>
-      <div class="layer-content">
-        <div class="layer-title">Soul Level</div>
-        <div class="layer-desc">Profound. Requires real honesty.</div>
-      </div>
-    </div>
-  </div>
-</div>
 
-<!-- ═══════════════════════════════════════════════════════════
-     GAME SCREEN
-     ═══════════════════════════════════════════════════════════ -->
-<div id="game" class="screen">
-  <div class="game-header">
-    <div class="back-arrow" onclick="endSession()">←</div>
-    <div class="current-deck" id="current-deck-name"></div>
-    <div class="menu-icon">⋮</div>
-  </div>
-  
-  <div class="card-container" id="card-container">
-    <!-- Card gets inserted here by JavaScript -->
-  </div>
-</div>
+Peel Again Home
+←
+Peelr
 
-<!-- ═══════════════════════════════════════════════════════════
-     RECAP SCREEN
-     ═══════════════════════════════════════════════════════════ -->
-<div id="recap" class="screen">
-  <h1 class="recap-title">That was a Peel.</h1>
-  <div class="recap-stats" id="recap-stats"></div>
-  <div class="recap-quote" id="recap-quote"></div>
-  <div class="recap-actions">
-    <button class="button" onclick="showScreen('category-select')">Peel Again</button>
-    <button class="button secondary" onclick="showScreen('home')">Home</button>
-  </div>
-</div>
+The Peel
+THE STORY
+"I started Peelr for myself."
+I'm a designer, and like a lot of designers, I notice the gaps between how things feel and how they could feel. One of those gaps was in conversation.
+I used to carry a physical deck of question cards everywhere — to dinners with friends, to family gatherings, on trips. The cards had this way of cracking things open. A question would land and suddenly we weren't talking about work or the weather anymore. We were somewhere real.
+Then one day I lost the deck. I looked everywhere. Couldn't find it. And I realized — I'd been dependent on a physical object to have the conversations I actually wanted to have. That felt like a problem worth solving.
+So I built Peelr. A digital deck that lives in your pocket, works anywhere, never gets lost, and never runs out of questions.
+The second reason was travel. I move around a lot, and one of my favorite things about being somewhere new is the strangers. The person next to you on a flight, the host you're staying with, the someone you end up talking to at 2am in a city you don't live in. Those conversations can be extraordinary — if you ask the right thing.
+At its core, this is a tool for going deeper with the people in front of you — whoever they are. Friends you've known for years but never really asked. Family members whose stories you've never heard. A partner you love but still want to know more of. A stranger you only have one night with.
+Every question is written with care. New ones arrive every month.
+If a draw ever took you somewhere you didn't expect — I'd genuinely love to hear about it.
+THE LANGUAGE OF PEELR
+Peelers
+The people who play Peelr. If you're here, you're one of us.
+A Peel
+One full session of the game. Not a round. Not a game. A Peel.
+The Draw
+Each individual question card. Every draw is a chance to go somewhere new.
+The Layers
+Five depths, from surface to soul. Layer 1 is easy. Layer 5 requires something.
+Going Deep
+What happens when you stop asking how someone's doing and start asking who they are.
+A Soft Peel
+Layers 1 and 2. A good place to start. No pressure.
+The Surface
+Where most conversations live. Peelr exists to get you past it.
+Peeling Someone
+The act of playing Peelr with another person. The best verb we've ever owned.
+SUPPORT
+Peelr is free. It always will be. If a draw meant something to you, you can support it here:
+Buy Us a Coffee ✦ FIND PEELR
+playpeelr.com @playpeelr on Instagram @playpeelr on TikTok @playpeelr on X
+Privacy & Legal →
+←
+Peelr
 
-<!-- ═══════════════════════════════════════════════════════════
-     THE PEEL PAGE
-     ═══════════════════════════════════════════════════════════ -->
-<div id="the-peel" class="screen text-page">
-  <div class="back-arrow" onclick="showScreen('home')">←</div>
-  
-  <h1 class="page-title">The Peel</h1>
-  
-  <span class="section-label">THE STORY</span>
-  <p class="body-text large">"I started Peelr for myself."</p>
-  
-  <p class="body-text">I'm a designer, and like a lot of designers, I notice the gaps between how things feel and how they could feel. One of those gaps was in conversation.</p>
-  
-  <p class="body-text">I used to carry a physical deck of question cards everywhere — to dinners with friends, to family gatherings, on trips. The cards had this way of cracking things open. A question would land and suddenly we weren't talking about work or the weather anymore. We were somewhere real.</p>
-  
-  <p class="body-text">Then one day I lost the deck. I looked everywhere. Couldn't find it. And I realized — I'd been dependent on a physical object to have the conversations I actually wanted to have. That felt like a problem worth solving.</p>
-  
-  <p class="body-text">So I built Peelr. A digital deck that lives in your pocket, works anywhere, never gets lost, and never runs out of questions.</p>
-  
-  <p class="body-text">The second reason was travel. I move around a lot, and one of my favorite things about being somewhere new is the strangers. The person next to you on a flight, the host you're staying with, the someone you end up talking to at 2am in a city you don't live in. Those conversations can be extraordinary — if you ask the right thing.</p>
-  
-  <p class="body-text">At its core, this is a tool for going deeper with the people in front of you — whoever they are. Friends you've known for years but never really asked. Family members whose stories you've never heard. A partner you love but still want to know more of. A stranger you only have one night with.</p>
-  
-  <p class="body-text">Every question is written with care. New ones arrive every month.</p>
-  
-  <p class="body-text large">If a draw ever took you somewhere you didn't expect — I'd genuinely love to hear about it.</p>
-  
-  <span class="section-label">THE LANGUAGE OF PEELR</span>
-  <div class="vocab-grid">
-    <div class="vocab-item">
-      <div class="vocab-term">Peelers</div>
-      <div class="vocab-def">The people who play Peelr. If you're here, you're one of us.</div>
-    </div>
-    <div class="vocab-item">
-      <div class="vocab-term">A Peel</div>
-      <div class="vocab-def">One full session of the game. Not a round. Not a game. A Peel.</div>
-    </div>
-    <div class="vocab-item">
-      <div class="vocab-term">The Draw</div>
-      <div class="vocab-def">Each individual question card. Every draw is a chance to go somewhere new.</div>
-    </div>
-    <div class="vocab-item">
-      <div class="vocab-term">The Layers</div>
-      <div class="vocab-def">Five depths, from surface to soul. Layer 1 is easy. Layer 5 requires something.</div>
-    </div>
-    <div class="vocab-item">
-      <div class="vocab-term">Going Deep</div>
-      <div class="vocab-def">What happens when you stop asking how someone's doing and start asking who they are.</div>
-    </div>
-    <div class="vocab-item">
-      <div class="vocab-term">A Soft Peel</div>
-      <div class="vocab-def">Layers 1 and 2. A good place to start. No pressure.</div>
-    </div>
-    <div class="vocab-item">
-      <div class="vocab-term">The Surface</div>
-      <div class="vocab-def">Where most conversations live. Peelr exists to get you past it.</div>
-    </div>
-    <div class="vocab-item">
-      <div class="vocab-term">Peeling Someone</div>
-      <div class="vocab-def">The act of playing Peelr with another person. The best verb we've ever owned.</div>
-    </div>
-  </div>
-  
-  <span class="section-label">SUPPORT</span>
-  <p class="body-text">Peelr is free. It always will be. If a draw meant something to you, you can support it here:</p>
-  <a href="https://ko-fi.com/playpeelr" target="_blank" class="support-button">Buy Us a Coffee ✦</a>
-  
-  <span class="section-label">FIND PEELR</span>
-  <div class="social-links">
-    <a href="https://playpeelr.com" target="_blank">playpeelr.com</a>
-    <a href="https://instagram.com/playpeelr" target="_blank">@playpeelr on Instagram</a>
-    <a href="https://tiktok.com/@playpeelr" target="_blank">@playpeelr on TikTok</a>
-    <a href="https://x.com/playpeelr" target="_blank">@playpeelr on X</a>
-  </div>
-  
-  <div style="margin-top:48px;text-align:center">
-    <a onclick="showScreen('privacy')" style="font-size:11px;color:var(--dim);cursor:pointer">Privacy & Legal →</a>
-  </div>
-</div>
+Privacy & Legal
+Plain language. No fine print.
+THE SHORT VERSION
+Peelr is a free card game. We don't collect your personal data. We don't track you. We don't sell anything about you to anyone. You don't need an account to play. You're just here to have better conversations — and so are we.
+DATA & PRIVACY
+Peelr does not collect, store, or share your personal information. We do not require you to create an account. We do not ask for your name, email address, phone number, or any identifying information to use the app. We do not track your location. We do not use cookies to follow you across the internet. We do not sell your data to third parties. Ever.
+The app may use basic anonymous analytics to help us improve the experience. This data is aggregate and anonymous — it cannot be used to identify you individually.
+Your conversations are your own. What happens in a Peel stays in a Peel. We have no access to what you say, share, or discuss while playing.
+SPONSORED MOMENTS & AFFILIATE LINKS
+Peelr is free and will always be free. To support the ongoing development of the app, we occasionally include sponsored moments between draws. These are branded cards that appear between question cards during a session. They are clearly labeled "Sponsored Moment." You can swipe past any sponsored card instantly.
+Some sponsored cards may contain affiliate links. If you tap through and make a purchase, Peelr may receive a small commission at no cost to you. Sponsors do not have access to any of your data.
+ADULT CONTENT
+Peelr contains questions intended for mature audiences, particularly within the Lovers deck at deeper layers. Some questions are explicitly sexual or deeply intimate. These questions are designed for consenting adults in established relationships.
+By choosing the Lovers deck at Layer 4 or Layer 5, you confirm that you are 18 years of age or older and that all participants in your session are consenting adults.
+Peelr is not intended for use by anyone under the age of 18. If you are under 18, please use the Friends, Family, Coworkers, or Strangers decks at Layers 1 through 3.
+YOUR RIGHTS
+Everything about your experience with Peelr belongs to you. Your conversations, your answers, your moments — they are yours. The questions in Peelr are original and are the intellectual property of Peelr. You are welcome to share individual questions. You may not reproduce the full question sets or use them commercially without permission.
+THE BASICS
+Effective date: 2026 App: Peelr Website: playpeelr.com Contact: hello@playpeelr.com
+This policy may be updated occasionally as the app grows. By using Peelr, you agree to this policy.
+←
+Peelr
 
-<!-- ═══════════════════════════════════════════════════════════
-     PRIVACY & LEGAL
-     ═══════════════════════════════════════════════════════════ -->
-<div id="privacy" class="screen text-page">
-  <div class="back-arrow" onclick="showScreen('the-peel')">←</div>
-  
-  <h1 class="page-title">Privacy & Legal</h1>
-  <div class="page-subtitle">Plain language. No fine print.</div>
-  
-  <span class="section-label">THE SHORT VERSION</span>
-  <p class="body-text large">Peelr is a free card game. We don't collect your personal data. We don't track you. We don't sell anything about you to anyone. You don't need an account to play. You're just here to have better conversations — and so are we.</p>
-  
-  <span class="section-label">DATA & PRIVACY</span>
-  <p class="body-text">Peelr does not collect, store, or share your personal information. We do not require you to create an account. We do not ask for your name, email address, phone number, or any identifying information to use the app. We do not track your location. We do not use cookies to follow you across the internet. We do not sell your data to third parties. Ever.</p>
-  
-  <p class="body-text">The app may use basic anonymous analytics to help us improve the experience. This data is aggregate and anonymous — it cannot be used to identify you individually.</p>
-  
-  <p class="body-text">Your conversations are your own. What happens in a Peel stays in a Peel. We have no access to what you say, share, or discuss while playing.</p>
-  
-  <span class="section-label">SPONSORED MOMENTS & AFFILIATE LINKS</span>
-  <p class="body-text">Peelr is free and will always be free. To support the ongoing development of the app, we occasionally include sponsored moments between draws. These are branded cards that appear between question cards during a session. They are clearly labeled "Sponsored Moment." You can swipe past any sponsored card instantly.</p>
-  
-  <p class="body-text">Some sponsored cards may contain affiliate links. If you tap through and make a purchase, Peelr may receive a small commission at no cost to you. Sponsors do not have access to any of your data.</p>
-  
-  <span class="section-label">ADULT CONTENT</span>
-  <p class="body-text">Peelr contains questions intended for mature audiences, particularly within the Lovers deck at deeper layers. Some questions are explicitly sexual or deeply intimate. These questions are designed for consenting adults in established relationships.</p>
-  
-  <p class="body-text"><strong>By choosing the Lovers deck at Layer 4 or Layer 5, you confirm that you are 18 years of age or older and that all participants in your session are consenting adults.</strong></p>
-  
-  <p class="body-text">Peelr is not intended for use by anyone under the age of 18. If you are under 18, please use the Friends, Family, Coworkers, or Strangers decks at Layers 1 through 3.</p>
-  
-  <span class="section-label">YOUR RIGHTS</span>
-  <p class="body-text">Everything about your experience with Peelr belongs to you. Your conversations, your answers, your moments — they are yours. The questions in Peelr are original and are the intellectual property of Peelr. You are welcome to share individual questions. You may not reproduce the full question sets or use them commercially without permission.</p>
-  
-  <span class="section-label">THE BASICS</span>
-  <p class="body-text">Effective date: 2026<br>App: Peelr<br>Website: playpeelr.com<br>Contact: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ed8588818182ad9d818c949d8888819fc38e8280">[email&#160;protected]</a></p>
-  
-  <p class="body-text">This policy may be updated occasionally as the app grows. By using Peelr, you agree to this policy.</p>
-</div>
+How to Peel
+STEP 01
+Pick Your People Choose who you're playing with — Friends, Family, Coworkers, Lovers, or Strangers.
+STEP 02
+Choose Your Layer Select a depth from Layer 1 (light and fun) to Layer 5 (soul level). You decide how deep.
+STEP 03
+Pull a Draw and Answer Swipe through questions one at a time. Read each one out loud. Everyone answers. There are no wrong answers.
+A FEW THINGS TO KNOW
+• You can switch decks or layers by tapping the dots on any card • Questions cycle back around when you reach the end • There's no winning. There's only going deeper.
+There's no winning. There's only going deeper.
+←
+Peelr
 
-<!-- ═══════════════════════════════════════════════════════════
-     HOW TO PLAY
-     ═══════════════════════════════════════════════════════════ -->
-<div id="how-to-play" class="screen text-page">
-  <div class="back-arrow" onclick="showScreen('home')">←</div>
-  
-  <h1 class="page-title">How to Peel</h1>
-  
-  <span class="section-label">STEP 01</span>
-  <p class="body-text"><strong>Pick Your People</strong><br>Choose who you're playing with — Friends, Family, Coworkers, Lovers, or Strangers.</p>
-  
-  <span class="section-label">STEP 02</span>
-  <p class="body-text"><strong>Choose Your Layer</strong><br>Select a depth from Layer 1 (light and fun) to Layer 5 (soul level). You decide how deep.</p>
-  
-  <span class="section-label">STEP 03</span>
-  <p class="body-text"><strong>Pull a Draw and Answer</strong><br>Swipe through questions one at a time. Read each one out loud. Everyone answers. There are no wrong answers.</p>
-  
-  <span class="section-label">A FEW THINGS TO KNOW</span>
-  <p class="body-text">• You can switch decks or layers by tapping the dots on any card<br>• Questions cycle back around when you reach the end<br>• There's no winning. There's only going deeper.</p>
-  
-  <p class="body-text large" style="margin-top:48px">There's no winning. There's only going deeper.</p>
-</div>
+Settings
+APPEARANCE
+Light Mode
 
-<!-- ═══════════════════════════════════════════════════════════
-     SETTINGS
-     ═══════════════════════════════════════════════════════════ -->
-<div id="settings" class="screen text-page">
-  <div class="back-arrow" onclick="showScreen('home')">←</div>
-  
-  <h1 class="page-title">Settings</h1>
-  
-  <span class="section-label">APPEARANCE</span>
-  <div class="toggle-row">
-    <div class="toggle-label">Light Mode</div>
-    <div class="toggle-switch" id="theme-toggle" onclick="toggleTheme()">
-      <div class="toggle-knob"></div>
-    </div>
-  </div>
-</div>
-
-<!-- Scripts -->
-<script src="questions.js"></script>
-   <script src="app.js"></script>
-   <script src="game.js"></script>
-
-</body>
-</html>
