@@ -71,10 +71,6 @@ body::before {
 
 body.light-mode::before { opacity: 0.018; }
 
-/* ═══════════════════════════════════════════════════════════
-   SCREENS
-   ═══════════════════════════════════════════════════════════ */
-
 .screen {
   display: none;
   height: 100vh;
@@ -83,10 +79,6 @@ body.light-mode::before { opacity: 0.018; }
 }
 
 .screen.active { display: flex; }
-
-/* ═══════════════════════════════════════════════════════════
-   PAGE HEADER (All Screens)
-   ═══════════════════════════════════════════════════════════ */
 
 .page-header {
   height: 56px;
@@ -122,10 +114,6 @@ body.light-mode::before { opacity: 0.018; }
 .app-name-header:hover { color: var(--gold); }
 
 .header-spacer { width: 32px; }
-
-/* ═══════════════════════════════════════════════════════════
-   HOME SCREEN
-   ═══════════════════════════════════════════════════════════ */
 
 #home {
   justify-content: center;
@@ -202,10 +190,6 @@ body.light-mode::before { opacity: 0.018; }
 }
 
 .bottom-nav a:hover { color: var(--gold); }
-
-/* ═══════════════════════════════════════════════════════════
-   CATEGORY SELECTION
-   ═══════════════════════════════════════════════════════════ */
 
 #category-select {
   overflow-y: auto;
@@ -288,10 +272,6 @@ body.light-mode::before { opacity: 0.018; }
   width: 100%;
 }
 
-/* ═══════════════════════════════════════════════════════════
-   LAYER SELECTION
-   ═══════════════════════════════════════════════════════════ */
-
 .layer-list {
   display: flex;
   flex-direction: column;
@@ -343,10 +323,6 @@ body.light-mode::before { opacity: 0.018; }
   line-height: 1.5;
 }
 
-/* ═══════════════════════════════════════════════════════════
-   GAME SCREEN
-   ═══════════════════════════════════════════════════════════ */
-
 .game-header {
   height: 56px;
   display: flex;
@@ -396,6 +372,7 @@ body.light-mode::before { opacity: 0.018; }
   cursor: grab;
   user-select: none;
   touch-action: none;
+  position: relative;
 }
 
 .question-card:active { cursor: grabbing; }
@@ -486,10 +463,6 @@ body.light-mode::before { opacity: 0.018; }
 
 .share-icon:hover { color: var(--gold); }
 
-/* ═══════════════════════════════════════════════════════════
-   SWITCHER MODAL
-   ═══════════════════════════════════════════════════════════ */
-
 .switcher-overlay {
   position: fixed;
   inset: 0;
@@ -578,10 +551,6 @@ body.light-mode::before { opacity: 0.018; }
   background: var(--gold);
   color: var(--bg);
 }
-
-/* ═══════════════════════════════════════════════════════════
-   TEXT PAGES
-   ═══════════════════════════════════════════════════════════ */
 
 .text-page {
   overflow-y: auto;
@@ -748,10 +717,6 @@ body.light-mode::before { opacity: 0.018; }
 
 .toggle-switch.active .toggle-knob { left: 25px; }
 
-/* ═══════════════════════════════════════════════════════════
-   RECAP SCREEN
-   ═══════════════════════════════════════════════════════════ */
-
 #recap {
   justify-content: center;
   align-items: center;
@@ -819,10 +784,6 @@ body.light-mode::before { opacity: 0.018; }
   background: transparent;
   color: var(--gold);
 }
-
-/* ═══════════════════════════════════════════════════════════
-   RESPONSIVE
-   ═══════════════════════════════════════════════════════════ */
 
 @media (max-width: 480px) {
   .play-button {
