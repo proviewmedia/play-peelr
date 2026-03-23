@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Play Peelr — Conversation Card Game Online Free</title>
+<meta name="description" content="Play Peelr free in your browser. 300+ conversation questions across 5 decks and 3 layers. No download required.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://playpeelr.com/play">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P65EQM0R01"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-P65EQM0R01');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+:root{
+  --bg:#0B0A0A;--surface:#161414;--surface2:#1E1B1B;
+  --gold:#D4AF77;--cream:#F5F1EA;--muted:#AAA096;--dim:#6B625A;
+  --friends:#D4AF77;--family:#9DBF9D;--lovers:#D18B9B;--coworkers:#8AADCF;--strangers:#C5B0D5;
+  --dc:var(--gold);
+}
+body{background:var(--bg);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-weight:300;-webkit-tap-highlight-color:transparent}
+
+/* ── SCREENS ── */
+.screen{display:none;height:100dvh;flex-direction:column}
+.screen.active{display:flex}
+
+/* ══════════════════════════════════════
+   PICKER SCREEN
+══════════════════════════════════════ */
+#picker{overflow:hidden}
+
+.picker-header{
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  padding:18px 24px 14px;
+  position:relative;
+}
+.logo{font-size:15px;font-weight:400;letter-spacing:0.28em;text-transform:uppercase;color:var(--gold);text-decoration:none}
+
+.picker-body{
+  flex:1;overflow-y:auto;
+  padding:0 20px 16px;
+  display:flex;flex-direction:column;gap:20px;
+}
+
+/* Section labels */
+.pick-label{
+  font-size:10px;font-weight:600;letter-spacing:0.28em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:10px;display:block;
+}
+
+/* ── DECK CARDS (big, full-width rows) ── */
+.deck-list{display:flex;flex-direction:column;gap:8px}
+.deck-card{
+  display:flex;align-items:center;gap:18px;
+  padding:18px 22px;
+  background:var(--surface);
+  border:1.5px solid rgba(255,255,255,0.05);
+  border-left:4px solid var(--dc);
+  border-radius:14px;
+  cursor:pointer;transition:all 0.22s;
+}
+.deck-card:hover{background:var(--surface2);border-color:rgba(255,255,255,0.12);border-left-color:var(--dc)}
+.deck-card.active{border-color:var(--dc);background:var(--surface2)}
+.deck-card-emoji{font-size:22px;width:30px;text-align:center;flex-shrink:0}
+.deck-card-name{font-size:16px;font-weight:500;color:var(--dc);margin-bottom:3px;letter-spacing:0.03em}
+.deck-card-desc{font-size:12px;font-weight:300;color:var(--muted);line-height:1.4}
+.deck-card-check{
+  margin-left:auto;width:20px;height:20px;border-radius:50%;
+  border:1.5px solid var(--dc);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:10px;color:var(--dc);
+  opacity:0;transition:opacity 0.2s;
+}
+.deck-card.active .deck-card-check{opacity:1}
+
+/* ── LAYER TILES (compact 5-across row) ── */
+.layer-tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.layer-tile{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:12px 6px 10px;
+  background:var(--surface);border:1.5px solid rgba(255,255,255,0.05);
+  border-radius:12px;cursor:pointer;transition:all 0.2s;
+  position:relative;text-align:center;min-height:72px;
+}
+.layer-tile:hover{background:var(--surface2)}
+.layer-tile.active{border-color:var(--dc);background:var(--surface2)}
+.layer-tile.locked{opacity:0.6;cursor:pointer}
+.layer-tile-num{
+  font-size:26px;font-weight:300;color:var(--gold);
+  line-height:1;margin-bottom:5px;
+}
+.layer-tile-name{
+  font-size:10px;font-weight:500;letter-spacing:0.06em;
+  color:var(--muted);line-height:1.3;
+  transition:color 0.2s;
+}
+.layer-tile.active .layer-tile-name{color:var(--dc)}
+.layer-tile-lock{
+  position:absolute;top:6px;right:6px;
+  font-size:9px;color:var(--gold);opacity:0.7;
+}
+.layer-badge{
+  font-size:9px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;
+  padding:2px 7px;border-radius:100px;white-space:nowrap;margin-top:4px;
+}
+.badge-free{color:var(--family);border:1px solid var(--family)}
+.badge-lock{color:var(--gold);border:1px solid rgba(212,175,119,0.35);background:rgba(212,175,119,0.05)}
+
+/* ── START BUTTON ── */
+.picker-footer{flex-shrink:0;padding:12px 20px 28px}
+.start-btn{
+  width:100%;padding:17px;
+  background:var(--gold);color:var(--bg);border:none;border-radius:100px;
+  font-family:inherit;font-size:14px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;
+  cursor:pointer;transition:opacity 0.2s;
+}
+.start-btn:hover{opacity:0.9}
+.start-btn:active{opacity:0.8;transform:scale(0.99)}
+
+/* ══════════════════════════════════════
+   CARD SCREEN
+══════════════════════════════════════ */
+#cards{overflow:hidden}
+
+.card-header{
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  padding:18px 24px 12px;
+  position:relative;
+}
+.card-logo{
+  font-size:15px;font-weight:400;letter-spacing:0.28em;text-transform:uppercase;
+  color:var(--gold);cursor:pointer;text-decoration:none;
+  transition:opacity 0.2s;
+}
+.card-logo:hover{opacity:0.7}
+.header-back{
+  position:absolute;left:24px;
+  font-size:12px;font-weight:400;letter-spacing:0.06em;color:var(--dim);
+  background:none;border:none;font-family:inherit;cursor:pointer;
+  padding:4px;transition:color 0.2s;display:flex;align-items:center;gap:5px;
+}
+.header-back:hover{color:var(--muted)}
+.header-ios{
+  position:absolute;right:24px;
+  font-size:12px;font-weight:400;letter-spacing:0.08em;color:var(--dim);
+  text-decoration:none;transition:color 0.2s;
+}
+.header-ios:hover{color:var(--muted)}
+
+/* Card area — centered, constrained */
+.card-area{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:0 24px;overflow:hidden;position:relative;
+}
+.q-card{
+  width:100%;max-width:400px;aspect-ratio:5/7;
+  background:var(--surface);
+  border:1px solid rgba(255,255,255,0.05);
+  border-left:4px solid var(--dc);
+  border-radius:24px;padding:36px 32px;
+  display:flex;flex-direction:column;justify-content:space-between;
+  user-select:none;
+  transition:transform 0.26s ease,opacity 0.26s ease;
+}
+.q-card.exit-left{transform:translateX(-115%) rotate(-7deg);opacity:0}
+.q-card.exit-right{transform:translateX(115%) rotate(7deg);opacity:0}
+.q-card.enter{animation:cardIn 0.3s ease forwards}
+@keyframes cardIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+.q-top{display:flex;justify-content:space-between;align-items:flex-start}
+.q-tag-deck{font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--dc)}
+.q-tag-layer{font-size:10px;font-weight:400;letter-spacing:0.1em;color:var(--dim)}
+.q-text{
+  font-size:clamp(17px,4.5vw,24px);font-weight:300;font-style:italic;
+  text-align:center;line-height:1.6;color:var(--cream);
+  flex:1;display:flex;align-items:center;justify-content:center;padding:16px 0;
+}
+.q-bottom{display:flex;align-items:center;justify-content:center;position:relative}
+.q-count{font-size:11px;color:var(--dim);letter-spacing:0.06em;position:absolute;left:0}
+.q-swipe-hint{font-size:11px;color:var(--dim);letter-spacing:0.06em;text-align:center}
+.q-share-btn{
+  position:absolute;right:0;
+  background:none;border:none;cursor:pointer;
+  color:var(--dim);padding:4px;transition:color 0.2s;
+  display:flex;align-items:center;justify-content:center;
+}
+.q-share-btn:hover{color:var(--gold)}
+.q-share-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── CARD NAV — only prev/next ── */
+.card-nav{
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;gap:20px;
+  padding:10px 24px 28px;
+}
+.nav-btn{
+  width:56px;height:56px;border-radius:50%;
+  border:1.5px solid rgba(255,255,255,0.1);background:transparent;
+  color:var(--muted);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;
+}
+.nav-btn:hover{border-color:rgba(255,255,255,0.25);color:var(--cream)}
+.nav-btn:active{transform:scale(0.93)}
+.nav-btn.next{width:72px;height:72px;background:var(--gold);border-color:var(--gold);color:var(--bg)}
+.nav-btn.next:hover{opacity:0.9}
+.nav-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.nav-btn.next svg{width:24px;height:24px}
+
+/* ══════════════════════════════════════
+   PAYWALL OVERLAY
+══════════════════════════════════════ */
+.paywall{
+  display:none;position:fixed;inset:0;z-index:400;
+  background:rgba(11,10,10,0.97);backdrop-filter:blur(20px);
+  flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:36px 28px;overflow-y:auto;
+}
+.paywall.active{display:flex}
+.pw-lock{font-size:40px;margin-bottom:18px}
+.pw-eye{font-size:11px;font-weight:600;letter-spacing:0.26em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.pw-title{font-size:clamp(26px,6vw,38px);font-weight:300;line-height:1.25;margin-bottom:10px}
+.pw-title em{font-style:italic;color:var(--gold)}
+.pw-sub{font-size:14px;font-weight:300;color:var(--muted);max-width:340px;line-height:1.75;margin-bottom:26px}
+.pw-price{
+  display:inline-flex;flex-direction:column;align-items:center;
+  background:rgba(212,175,119,0.06);border:1px solid rgba(212,175,119,0.18);
+  border-radius:16px;padding:18px 36px;margin-bottom:26px;
+}
+.pw-amount{font-size:38px;font-weight:300;color:var(--gold)}
+.pw-period{font-size:12px;color:var(--muted);margin-top:6px;letter-spacing:0.06em}
+.pw-feats{display:flex;flex-direction:column;gap:10px;margin-bottom:30px;text-align:left;max-width:300px;width:100%}
+.pw-feat{font-size:14px;font-weight:300;color:var(--cream);display:flex;align-items:center;gap:10px}
+.pw-feat::before{content:'✦';color:var(--gold);font-size:10px;flex-shrink:0}
+.pw-btn{
+  display:block;width:100%;max-width:320px;
+  padding:18px 32px;background:var(--gold);color:var(--bg);
+  border:none;border-radius:100px;font-family:inherit;
+  font-size:14px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;
+  cursor:pointer;text-decoration:none;transition:all 0.3s;text-align:center;margin-bottom:14px;
+}
+.pw-btn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(212,175,119,0.25)}
+.pw-dismiss{
+  background:none;border:none;font-family:inherit;
+  font-size:13px;color:var(--dim);cursor:pointer;letter-spacing:0.04em;padding:10px;
+}
+.pw-dismiss:hover{color:var(--muted)}
+
+/* ── DESKTOP: constrain width ── */
+@media(min-width:640px){
+  .picker-header,.picker-footer{max-width:560px;margin-left:auto;margin-right:auto;width:100%}
+  .picker-body{max-width:560px;margin-left:auto;margin-right:auto;width:100%}
+  .card-header{max-width:560px;margin-left:auto;margin-right:auto;width:100%}
+  .card-nav{max-width:560px;margin-left:auto;margin-right:auto;width:100%}
+  .q-card{max-width:380px}
+}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(212,175,119,0.18);border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ PICKER SCREEN ══════════════ -->
+<div class="screen active" id="picker">
+
+  <div class="picker-header">
+    <span class="logo">PEELR</span>
+    <a href="https://apps.apple.com/app/peelr/id6759850540" target="_blank" class="header-ios">iOS App ↗</a>
+  </div>
+
+  <div class="picker-body">
+
+    <!-- DECK -->
+    <div>
+      <span class="pick-label">Who are you with?</span>
+      <div class="deck-list" id="deck-list">
+        <div class="deck-card active" style="--dc:var(--friends)" onclick="selectDeck('friends',this)">
+          <div class="deck-card-emoji">👋</div>
+          <div><div class="deck-card-name">Friends</div><div class="deck-card-desc">The people who know you. Or think they do.</div></div>
+          <div class="deck-card-check">✓</div>
+        </div>
+        <div class="deck-card" style="--dc:var(--family)" onclick="selectDeck('family',this)">
+          <div class="deck-card-emoji">🌿</div>
+          <div><div class="deck-card-name">Family</div><div class="deck-card-desc">The roots that shaped you.</div></div>
+          <div class="deck-card-check">✓</div>
+        </div>
+        <div class="deck-card" style="--dc:var(--lovers)" onclick="selectDeck('lovers',this)">
+          <div class="deck-card-emoji">♡</div>
+          <div><div class="deck-card-name">Lovers</div><div class="deck-card-desc">The ones who see all of you.</div></div>
+          <div class="deck-card-check">✓</div>
+        </div>
+        <div class="deck-card" style="--dc:var(--coworkers)" onclick="selectDeck('coworkers',this)">
+          <div class="deck-card-emoji">⚡</div>
+          <div><div class="deck-card-name">Coworkers</div><div class="deck-card-desc">The people you build with.</div></div>
+          <div class="deck-card-check">✓</div>
+        </div>
+        <div class="deck-card" style="--dc:var(--strangers)" onclick="selectDeck('strangers',this)">
+          <div class="deck-card-emoji">✦</div>
+          <div><div class="deck-card-name">Strangers</div><div class="deck-card-desc">The people you have not met yet.</div></div>
+          <div class="deck-card-check">✓</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LAYER -->
+    <div>
+      <span class="pick-label">How deep?</span>
+      <div class="layer-tiles" id="layer-list"></div>
+    </div>
+
+  </div>
+
+  <div class="picker-footer">
+    <button class="start-btn" onclick="startGame()">Start Peeling →</button>
+  </div>
+
+</div>
+
+<!-- ══════════════ CARD SCREEN ══════════════ -->
+<div class="screen" id="cards">
+
+  <div class="card-header">
+    <button class="header-back" onclick="goToPicker()">
+      <svg viewBox="0 0 16 16" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round"><polyline points="10 4 6 8 10 12"/></svg>
+      Back
+    </button>
+    <span class="logo" style="cursor:pointer" onclick="goToPicker()">PEELR</span>
+    <a href="https://apps.apple.com/app/peelr/id6759850540" target="_blank" class="header-ios">iOS App ↗</a>
+  </div>
+
+  <div class="card-area">
+    <div class="q-card enter" id="q-card">
+      <div class="q-top">
+        <span class="q-tag-deck" id="q-tag-deck">Friends</span>
+        <span class="q-tag-layer" id="q-tag-layer">Layer 1</span>
+      </div>
+      <div class="q-text" id="q-text">Loading...</div>
+      <div class="q-bottom">
+        <span class="q-count" id="q-count"></span>
+        <span class="q-swipe-hint">swipe or use arrows</span>
+        <button class="q-share-btn" onclick="shareCard()" title="Share this question">
+          <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-nav">
+    <button class="nav-btn" onclick="prevCard()" title="Previous">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <button class="nav-btn next" onclick="nextCard()" title="Next">
+      <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+
+</div>
+
+<!-- ══════════════ PAYWALL ══════════════ -->
+<div class="paywall" id="paywall">
+  <div class="pw-lock">🔒</div>
+  <div class="pw-eye">Peelr Premium</div>
+  <h2 class="pw-title">Go <em>deeper</em> on iOS.</h2>
+  <p class="pw-sub">Layers 4 and 5 are exclusive to the Peelr iOS app. Download free and subscribe to unlock 200 more questions — the ones that actually change things.</p>
+  <div class="pw-price">
+    <div class="pw-amount">$1.99<span style="font-size:18px;color:var(--muted)">/mo</span></div>
+    <div class="pw-period">Cancel anytime</div>
+  </div>
+  <div class="pw-feats">
+    <div class="pw-feat">Layer 4 — Deep Dive (100 questions)</div>
+    <div class="pw-feat">Layer 5 — Soul Level (100 questions)</div>
+    <div class="pw-feat">New questions added every month</div>
+    <div class="pw-feat">All 5 decks, offline access</div>
+  </div>
+  <a href="https://apps.apple.com/app/peelr/id6759850540" target="_blank" class="pw-btn" onclick="gtag('event','paywall_ios_click',{deck:S.deck})">Download Peelr on iOS</a>
+  <button class="pw-dismiss" onclick="closePaywall()">Stay on free layers (1–3)</button>
+</div>
+
+<script>
+// ─── DATA ──────────────────────────────────────────────────────
+const LAYER_NAMES = {
+  friends:   ['Ice Breakers',  'Getting Real',         'The Deep End',          'Raw & Honest',            'Soul Friends'],
+  family:    ['Family Stories','Understanding Roots',   'Honest Reflections',    'Healing Conversations',   'Generational Bonds'],
+  lovers:    ['First Glances', 'Opening Up',            'True Colors',           'Vulnerable Hearts',       'Soul Ties'],
+  coworkers: ['Getting Started','Team Building',        'Work & Life',           'Leadership & Growth',     'Purpose & Impact'],
+  strangers: ['Hello World',   'Getting Curious',       'Real Talk',             'Unexpected Depth',        'Brief Infinity']
+};
+const LAYER_SUBS = {
+  friends:   ['Light, fun, easy to answer','A little more personal','Emotions, real experiences','Vulnerable and raw','Requires real honesty'],
+  family:    ['The stories you love to tell','Where it all started','What is real between you','The things left unsaid','Bonds that outlast everything'],
+  lovers:    ['Playful and curious','Starting to open up','Where it gets real','What you rarely say out loud','The questions that change things'],
+  coworkers: ['Easy, energizing, no pressure','Building real connection','Work meets life','How you lead and why','What drives you beyond a title'],
+  strangers: ['First impressions','Getting past the surface','Real conversation, fast','Unexpectedly honest','Brief but unforgettable']
+};
+const DECK_COLORS = {
+  friends:'var(--friends)',family:'var(--family)',lovers:'var(--lovers)',
+  coworkers:'var(--coworkers)',strangers:'var(--strangers)'
+};
+const DECK_NAMES = {friends:'Friends',family:'Family',lovers:'Lovers',coworkers:'Coworkers',strangers:'Strangers'};
+const DECK_EMOJIS = {friends:'👋',family:'🌿',lovers:'♡',coworkers:'⚡',strangers:'✦'};
+
+const Q = {
+  friends:{
+    1:["What is a song that always puts you in a good mood?","What is the best meal you have ever eaten and where was it?","If you could live anywhere for one year, where would it be?","What show or movie could you watch on repeat and never get tired of?","What is a hobby you have always wanted to try but have not yet?","What is your go-to order when you do not know what to get?","What is the most beautiful place you have ever been?","What is a skill you have that most people do not know about?","What does your perfect day off look like from start to finish?","What is something you are really good at that you never brag about?","What is the last thing that made you genuinely laugh out loud?","What is a place in your city you think more people should know about?","What is a book, podcast, or album that changed something for you?","If you could have dinner with anyone alive or dead, who would it be?","What is your most controversial food opinion?","What is the best piece of advice someone has ever given you?","What is something you have done recently that you are proud of?","What does your ideal weekend look like?","What is a random fact you know that always impresses people?","What is something small that you do every day that makes you genuinely happy?"],
+    2:["What is something you are working on getting better at right now?","What does friendship actually mean to you in practice?","When did you last step outside your comfort zone and what happened?","What is a compliment someone gave you that you still think about?","What is something you pretend not to care about but actually do?","What is a chapter of your life you look back on with mixed feelings?","What is something you have learned about yourself in the last year?","What is a dream you have put on the back burner that still lingers?","Who has influenced the way you think more than anyone else?","What does success mean to you right now, not five years ago?","What is something you wish you could tell your younger self?","What is a habit you have that you are not sure is helping you?","What is the hardest thing about the season of life you are currently in?","What do you find hardest about staying close to people you care about?","What is a fear that has quietly shaped a lot of your decisions?","What is something you have changed your mind about in the last two years?","What is a version of yourself you have been trying to become?","What is the most important thing a friendship can give you?","What is something you want more of in your life right now?","When do you feel most like yourself?"],
+    3:["What friendship have you let fade that you still think about?","What is a version of yourself you have outgrown but miss?","What do you need from your friends that you rarely ask for?","When did you last feel truly seen by someone?","What is something you have forgiven but not forgotten?","What is a part of your life right now that you do not talk about much?","What do you wish was different about how you grew up?","What is a moment from our friendship that changed how you see me?","What is the hardest part about being close to you?","What is something you have never told anyone but almost did?","What is a belief about yourself that you are still trying to shake?","What is a decision you made that changed the entire direction of your life?","What do you wish people understood about you without you having to explain it?","What is the loneliest you have ever felt?","What is something you are grieving right now even if no one has died?","What is a version of your future you are afraid of?","What is something you have never fully forgiven yourself for?","What do you think your biggest blind spot is?","What is the most honest thing you can say about where you are in life right now?","What is something you would do differently if you were not afraid of what people thought?"]
+  },
+  family:{
+    1:["What is your favorite family tradition?","What is a recipe that immediately feels like home?","Who in your family are you most like?","What is a story you love telling about your family?","What did your family always do on Sunday mornings?","What is something your family always laughs about?","What was your favorite thing about summers growing up?","What is a skill someone in your family taught you?","What does home mean to you right now?","What is the first memory you have of feeling proud of someone in your family?","What is a place your family always returned to?","What is something your parents said that stuck with you?","What is a family meal that you could eat forever?","What is something your family did that you want to carry forward?","What is a nickname someone in your family gave you?","What holiday was the most important to your family growing up?","What is something small from your childhood home that you still miss?","Who in your family told the best stories?","What is a family photo you love and what is happening in it?","What is a memory with a grandparent or older relative that you treasure?"],
+    2:["What is something your parents got right?","What is a hard conversation you have been avoiding with family?","Who in your family do you wish you knew better?","What is something you learned from watching your parents?","What role do you usually play in your family dynamic?","What do you wish your family understood about you?","What is a family pattern you are quietly trying to break?","What is something about your childhood that took years to understand?","What is the most important thing your family gave you?","What is something your family never talked about that you wish they had?","What is a way your upbringing shaped how you love people?","What is something you inherited from your parents that you are not sure is good?","How has your relationship with your family changed as you have gotten older?","What is something your family did differently from other families that you now appreciate?","What is a lesson you had to learn the hard way that your family could not teach you?","What is something you wish you had asked a family member before they were gone?","What does belonging feel like in your family?","What is a way your childhood prepared you for something you did not expect?","What is something about your parents that you now understand differently as an adult?","What is a sacrifice someone in your family made for you that you did not fully appreciate at the time?"],
+    3:["What is something your family never talked about that you wish they had?","What is a wound from your family you are still carrying?","What do you wish you had said to someone you have lost?","What did your childhood teach you about love?","When did you first realize your parents were just people trying to figure it out?","What is something you grieve about the family you grew up in?","What would your younger self think of your family relationships today?","What is a truth about your family that took years to see?","What does loyalty mean in your family, and do you agree with it?","What is something your family shaped in you that you are still untangling?","What is a way your family made you feel like you had to earn love?","What is the most honest thing you have ever said to a family member?","What is something a parent or sibling did that you have had to work to forgive?","What is a version of your family that you mourn even if it never existed?","What do you wish your family had done differently when you were struggling?","What is the hardest conversation you have ever had with someone in your family?","What is something about your family dynamic that you have brought into your adult relationships without realizing it?","What is a story about your family that explains a lot about who you are?","What is something you have had to become that your family did not model for you?","What does it mean to you to heal something in your family line?"]
+  },
+  lovers:{
+    1:["What is your love language right now?","What is something small I do that you genuinely love?","What is your ideal weekend together?","What is a place you want us to go?","What makes you feel most loved?","What is your favorite memory of us?","When do you feel closest to me?","What is something you want us to try together?","What is a thing I do that always makes you smile?","What is one thing about me that surprised you?","What was your first impression of me?","What is something about me you brag about to other people?","What is a song that makes you think of us?","What is something we do together that you never want to stop?","What is your favorite version of a day with me?","What is something about the way I look at you that you love?","What is something I do that instantly makes you feel safe?","What is the moment you knew you wanted to be with me?","What is something we have not done together that you have been thinking about?","What is the most fun we have ever had together?"],
+    2:["What is something you need from me that you rarely ask for?","What is a part of your life you want to share more with me?","When have I shown up for you in a way that actually meant something?","What is something about love you are still figuring out?","What does feeling safe with someone mean to you?","What is something you have changed because of loving me?","What do you need more of in this relationship?","What is a version of us you are quietly working toward?","What is a fear you have about us that you carry quietly?","What is something I do that you have never told me you appreciate?","What is a way I have grown since being with you?","What is something you need me to understand about how you receive love?","What is a moment in our relationship that you go back to often?","What is something about our relationship that you are most proud of?","What is a way I could show up better for you?","What is something you have always wanted to tell me but have not found the right moment?","What does a perfect future together look like to you?","What is something about yourself you have only opened up about because of me?","What is a version of yourself you feel safe being with me that you cannot be anywhere else?","What is something about the way we love each other that you think is rare?"],
+    3:["What do you need from me that I am not giving you?","When have I hurt you without knowing it?","What is something about yourself you worry I do not fully see?","What is a way your past relationships still live inside you?","What does love have to look like for you to stay in it?","What is a version of yourself you are afraid to show me?","What have you let go of because of loving me?","What is the most honest thing you can say about how you feel about us right now?","What is the bravest thing you have done for this relationship?","What is something you have never told me but almost did?","What is a fear about the future that you have not said out loud?","What is something about intimacy that you have never fully explained to me?","What is a way I make you feel seen that no one else ever has?","What is something you want from our physical relationship that you have not asked for?","What is the most vulnerable you have ever been with me?","What is something about desire you have never told anyone?","What is a fantasy you have had about us?","What would you want our relationship to look like in ten years, honestly?","What is the thing about me that makes you feel the most alive?","What is something you are still learning about how to love me?"]
+  },
+  coworkers:{
+    1:["What is the first thing you do when you start your workday?","What is a tool or habit you cannot work without?","What does a productive day look like for you?","What is something you are genuinely excited about at work right now?","What is the best piece of work advice you have ever gotten?","What is a work win you have had recently?","How do you decompress after a stressful day?","What is something you are learning on the job right now?","What is your ideal working environment?","What is something you are looking forward to at work?","What is your most used shortcut or trick that saves you time?","What is something about this job that surprised you when you started?","What is the best part of your morning routine?","What is a project you worked on that you are most proud of?","What does a good manager look like to you?","What is something about your work style that people notice?","What is a skill you picked up at this job you did not expect to?","What is something you always make time for no matter how busy you are?","What is a meeting that you actually find valuable?","What is something small that makes your workday better?"],
+    2:["What motivates you beyond a paycheck?","What kind of feedback do you actually find useful?","When do you feel most energized at work?","What is a skill you bring to the team that often goes unnoticed?","What is something you need to do your best work?","What does good leadership look like to you?","What is something you have learned from a failure at work?","What is a challenge you are quietly navigating right now?","What is something you wish your team did differently?","What is a career risk you have been thinking about taking?","What is something about your work that you wish people outside your field understood?","What is a strength you have that you feel underutilized?","What is the most important thing you have learned about working with people?","What is a moment at work where you felt genuinely proud of the team?","What is a professional habit you have built that you think everyone should have?","What is something you wish you had known when you started this career?","What does collaboration actually look like at its best to you?","What is a work situation that tested your values?","What is something you are working toward professionally that you do not talk about much?","What is the most interesting problem you have had to solve at work?"],
+    3:["What is a professional fear you do not often talk about?","What is something you gave up to be good at what you do?","What does success actually mean to you?","When have you felt like an outsider at work?","What is the hardest part of the work you do?","What is something you are doing right now that does not feel like you?","What is a dream you have quietly let go of?","What would you do differently if no one was watching?","What does the work you actually want to be doing look like?","What is something about this job that has changed how you see yourself?","What is a moment your work made you question something important about who you are?","What is something you have sacrificed for your career that you are still deciding if it was worth it?","What is the most honest thing you can say about what you want from your career?","What is something about ambition that you have never said out loud at work?","What is a version of your professional life you are afraid of ending up in?","What is something you wish your workplace made space for that it does not?","What is a value you hold at work that has cost you something?","What is a moment a colleague surprised you in a way that changed how you work?","What is something about your relationship with work that you are still trying to figure out?","What is the difference between the work you do and the work you feel called to?"]
+  },
+  strangers:{
+    1:["What is something you are really into right now?","What is the best trip you have ever taken?","What is a skill most people do not know you have?","What is something you believed until recently that turned out to be wrong?","What is something you are looking forward to?","What is the last thing that genuinely surprised you?","What is a small thing that makes your day better?","What do you do when you want to feel like yourself again?","What is your most used app that is not social media?","What is a place you keep thinking about going?","What is a movie or show you think everyone should see?","What is something you collect, even if just informally?","What is a food you hated as a kid that you love now?","What is something you would do every day if you could?","What is the most interesting job you have ever had?","What is something you have done recently that you are glad you said yes to?","What would you be doing right now if today was completely free?","What is a place in the world you feel unexpectedly connected to?","What is a random thing you are currently obsessed with?","What is something that always makes you want to learn more about it?"],
+    2:["What is something you are figuring out right now?","What is the most interesting thing that happened to you this year?","What is a question you have been sitting with lately?","What is a fear you have made some kind of peace with?","What is something you believe that most people around you do not?","What is the best decision you have made for yourself?","What is a value you live by that most people would not guess?","What is something you are proud of that did not come easily?","What is a moment that divided your life into before and after?","What have you changed your mind about most recently?","What is something you carry with you everywhere, physically or emotionally?","What is a version of your life you almost chose instead?","What does home mean to you — is it a place or something else entirely?","What is the best piece of advice a stranger ever gave you?","What is something you wish more people were honest about?","What kind of people do you find most interesting to talk to?","What does adventure mean to you and when did you last feel it?","What is something about where you grew up that still lives in you?","What do you find hardest about being honest with people you just met?","What is something about yourself that took you a long time to accept?"],
+    3:["What is a version of your life you almost lived?","What is the loneliest you have ever felt?","What is something you are still carrying from your past?","What is the most honest thing you can say about who you are right now?","What is something you need that you have never asked anyone for?","What is a moment you would live again if you could?","What is the most important thing you have ever lost?","What do you want your life to feel like in ten years?","What is a truth about yourself that still scares you?","What is something you are figuring out right now that you have not said out loud?","What is a chapter of your life you have not fully processed yet?","What do you think people misunderstand about you most?","What is something you are still searching for that you can name?","What part of yourself do you bring to every room without meaning to?","What is a decision that took you somewhere you never expected?","What are you most afraid of getting wrong in your life?","What is the most important thing you have learned from being alone?","What does it take for you to feel truly seen by another person?","What is something you have never said to someone you just met but are willing to say now?","What is a truth you know about life that most people your age have not figured out yet?"]
+  }
+};
+
+// ─── SUPABASE QUESTION FETCH ────────────────────────────────────
+const SB_URL = 'https://gkzcgtdactlifnfztgft.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdremNndGRhY3RsaWZuZnp0Z2Z0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxNjQ1ODEsImV4cCI6MjA4OTc0MDU4MX0.pF_PwEFEOpLpKMCusylaYXFRgtF2-600YbBLefI58S4';
+const CACHE_KEY = 'peelr_q_cache';
+const CACHE_EXP = 'peelr_q_exp';
+const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
+async function fetchQuestions(){
+  try {
+    const now = Date.now();
+    const exp = parseInt(localStorage.getItem(CACHE_EXP) || '0');
+    if(exp > now){
+      const cached = localStorage.getItem(CACHE_KEY);
+      if(cached){ applyQuestions(JSON.parse(cached)); return; }
+    }
+    const res = await fetch(
+      SB_URL + '/rest/v1/questions?active=eq.true&select=deck,layer,text_en&order=deck,layer',
+      { headers:{ 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY } }
+    );
+    if(!res.ok) throw new Error('fetch failed');
+    const data = await res.json();
+    if(data && data.length > 0){
+      localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+      localStorage.setItem(CACHE_EXP, String(now + CACHE_TTL));
+      applyQuestions(data);
+    }
+  } catch(e){
+    console.log('Peelr: using offline questions');
+  }
+}
+
+function applyQuestions(data){
+  const decks = ['friends','family','lovers','coworkers','strangers'];
+  const fresh = {};
+  decks.forEach(d=>{ fresh[d]={}; for(let l=1;l<=5;l++) fresh[d][l]=[]; });
+  data.forEach(r=>{ if(fresh[r.deck]?.[r.layer] !== undefined) fresh[r.deck][r.layer].push(r.text_en); });
+  // Only override if every deck+layer has questions
+  const valid = decks.every(d=>[1,2,3,4,5].every(l=>fresh[d][l].length > 0));
+  if(valid) decks.forEach(d=>{ for(let l=1;l<=5;l++) Q[d][l]=fresh[d][l]; });
+}
+
+fetchQuestions();
+
+// ─── STATE ─────────────────────────────────────────────────────
+const S = {deck:'friends', layer:1};
+let questions=[], idx=0, history=[];
+
+// ─── INIT: render layer list for default deck ───────────────────
+renderLayers();
+
+// ─── DECK SELECT ────────────────────────────────────────────────
+function selectDeck(deck, el){
+  S.deck = deck;
+  document.querySelectorAll('.deck-card').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  renderLayers();
+}
+
+// ─── RENDER LAYER LIST ──────────────────────────────────────────
+function renderLayers(){
+  const names = LAYER_NAMES[S.deck];
+  const color = DECK_COLORS[S.deck];
+  const list  = document.getElementById('layer-list');
+  list.innerHTML = '';
+
+  for(let i=0;i<5;i++){
+    const n = i+1;
+    const locked = n > 3;
+    const isActive = S.layer === n && !locked;
+
+    const div = document.createElement('div');
+    div.className = 'layer-tile' + (isActive ? ' active' : '') + (locked ? ' locked' : '');
+    div.style.setProperty('--dc', color);
+
+    const badge = locked
+      ? `<span class="layer-badge badge-lock">iOS</span>`
+      : `<span class="layer-badge badge-free">Free</span>`;
+
+    const lockIcon = locked ? `<span class="layer-tile-lock">🔒</span>` : '';
+
+    div.innerHTML = `
+      ${lockIcon}
+      <div class="layer-tile-num">${n}</div>
+      <div class="layer-tile-name">${names[i]}</div>
+      ${badge}
+    `;
+
+    div.onclick = () => locked ? showPaywall(n) : pickLayer(n, div);
+    list.appendChild(div);
+  }
+}
+
+function pickLayer(n, el){
+  S.layer = n;
+  document.querySelectorAll('.layer-tile').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ─── START GAME ─────────────────────────────────────────────────
+function startGame(){
+  const pool = Q[S.deck]?.[S.layer];
+  if(!pool || pool.length === 0){ alert('No questions yet for this combination.'); return; }
+
+  questions = [...pool];
+  shuffle(questions);
+  idx = 0;
+  history = [];
+
+  // set card deck color
+  const color = DECK_COLORS[S.deck];
+  document.documentElement.style.setProperty('--dc', color);
+
+  // update card tags
+  const layerName = LAYER_NAMES[S.deck][S.layer - 1];
+  document.getElementById('q-tag-deck').textContent = DECK_NAMES[S.deck];
+  document.getElementById('q-tag-layer').textContent = layerName;
+
+  renderCard();
+  showScreen('cards');
+  gtag('event','game_start',{deck:S.deck,layer:S.layer});
+}
+
+// ─── CARD RENDERING ─────────────────────────────────────────────
+function renderCard(exitDir){
+  const card = document.getElementById('q-card');
+  if(exitDir){
+    card.classList.add(exitDir === 'left' ? 'exit-left' : 'exit-right');
+    setTimeout(()=>{
+      card.classList.remove('exit-left','exit-right','enter');
+      void card.offsetWidth;
+      writeCard();
+      card.classList.add('enter');
+    }, 240);
+  } else {
+    card.classList.remove('exit-left','exit-right','enter');
+    void card.offsetWidth;
+    writeCard();
+    card.classList.add('enter');
+  }
+}
+
+function writeCard(){
+  document.getElementById('q-text').textContent = questions[idx];
+  document.getElementById('q-count').textContent = (idx+1) + ' / ' + questions.length;
+}
+
+function nextCard(){
+  history.push(idx);
+  idx = (idx + 1) % questions.length;
+  renderCard('left');
+  gtag('event','card_next',{deck:S.deck,layer:S.layer});
+}
+
+function prevCard(){
+  if(history.length > 0){
+    idx = history.pop();
+  } else {
+    idx = (idx - 1 + questions.length) % questions.length;
+  }
+  renderCard('right');
+}
+
+// ─── NAVIGATION ─────────────────────────────────────────────────
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goToPicker(){
+  // re-render layers so names/state stay in sync
+  renderLayers();
+  showScreen('picker');
+}
+
+// ─── PAYWALL ────────────────────────────────────────────────────
+function showPaywall(n){
+  document.getElementById('paywall').classList.add('active');
+  gtag('event','paywall_view',{layer:n,deck:S.deck});
+}
+function closePaywall(){
+  document.getElementById('paywall').classList.remove('active');
+}
+
+// ─── UTILS ──────────────────────────────────────────────────────
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+}
+
+// ─── SHARE CARD ─────────────────────────────────────────────────
+function shareCard(){
+  const question = questions[idx];
+  const deckName = DECK_NAMES[S.deck];
+  const layerName = LAYER_NAMES[S.deck][S.layer - 1];
+  const deckColor = {
+    friends:'#D4AF77',family:'#9DBF9D',lovers:'#D18B9B',
+    coworkers:'#8AADCF',strangers:'#C5B0D5'
+  }[S.deck];
+
+  // Build canvas
+  const canvas = document.createElement('canvas');
+  const scale = 2; // retina
+  const W = 500, H = 700;
+  canvas.width = W * scale;
+  canvas.height = H * scale;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(scale, scale);
+
+  // Background
+  ctx.fillStyle = '#161414';
+  ctx.roundRect(0, 0, W, H, 24);
+  ctx.fill();
+
+  // Left accent bar
+  ctx.fillStyle = deckColor;
+  ctx.fillRect(0, 0, 4, H);
+
+  // Top labels
+  ctx.font = '600 11px "Josefin Sans", sans-serif';
+  ctx.letterSpacing = '2px';
+  ctx.fillStyle = deckColor;
+  ctx.textTransform = 'uppercase';
+  ctx.fillText(deckName.toUpperCase(), 36, 52);
+
+  ctx.fillStyle = '#6B625A';
+  ctx.textAlign = 'right';
+  ctx.fillText(layerName.toUpperCase(), W - 36, 52);
+  ctx.textAlign = 'left';
+
+  // Divider
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(36, 68);
+  ctx.lineTo(W - 36, 68);
+  ctx.stroke();
+
+  // Question text — wrapped
+  ctx.font = '300 italic 22px "Josefin Sans", sans-serif';
+  ctx.fillStyle = '#F5F1EA';
+  ctx.textAlign = 'center';
+  const words = question.split(' ');
+  const lines = [];
+  let line = '';
+  const maxW = W - 80;
+  for(const word of words){
+    const test = line ? line + ' ' + word : word;
+    if(ctx.measureText(test).width > maxW && line){
+      lines.push(line);
+      line = word;
+    } else { line = test; }
+  }
+  lines.push(line);
+
+  const lineH = 34;
+  const totalH = lines.length * lineH;
+  const startY = (H - totalH) / 2 - 20;
+  lines.forEach((l, i) => ctx.fillText(l, W / 2, startY + i * lineH));
+
+  // Bottom divider
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  ctx.beginPath();
+  ctx.moveTo(36, H - 80);
+  ctx.lineTo(W - 36, H - 80);
+  ctx.stroke();
+
+  // Branding
+  ctx.font = '400 13px "Josefin Sans", sans-serif';
+  ctx.fillStyle = deckColor;
+  ctx.letterSpacing = '3px';
+  ctx.fillText('PEELR', W / 2, H - 52);
+  ctx.font = '300 11px "Josefin Sans", sans-serif';
+  ctx.fillStyle = '#6B625A';
+  ctx.letterSpacing = '0';
+  ctx.fillText('playpeelr.com', W / 2, H - 34);
+
+  // Share or download
+  canvas.toBlob(blob => {
+    const file = new File([blob], 'peelr-question.png', {type:'image/png'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      navigator.share({files:[file], title:'Peelr', text: question});
+    } else {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'peelr-question.png';
+      a.click();
+    }
+  }, 'image/png');
+
+  gtag('event','card_share',{deck:S.deck,layer:S.layer});
+}
+
+// ─── SWIPE GESTURES ─────────────────────────────────────────────
+let tx=0, ty=0;
+document.getElementById('cards').addEventListener('touchstart',e=>{
+  tx=e.touches[0].clientX; ty=e.touches[0].clientY;
+},{passive:true});
+document.getElementById('cards').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  const dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>55){
+    dx<0 ? nextCard() : prevCard();
+  }
+},{passive:true});
+</script>
+</body>
+</html>
