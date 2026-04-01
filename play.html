@@ -2972,14 +2972,21 @@ const SUPABASE_Q_URL = 'https://ulceqexaniglqqriwdpt.supabase.co';
 const SUPABASE_Q_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVsY2VxZXhhbmlnbHFxcml3ZHB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwMjg0NzIsImV4cCI6MjA5MDYwNDQ3Mn0.ArOvZyWEhTvBzj60DOpIlhjPHK0L-ETJ1dAOsRItGhU';
 const CACHE_KEY = 'peelr-questions-cache';
 const CACHE_EXPIRY_KEY = 'peelr-questions-expiry';
-const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
 
 async function fetchQuestionsFromSupabase() {
   try {
-    // Check cache first
+    // Clear old cache on new version
+    const cacheVersion = localStorage.getItem('peelr-cache-version');
+    if (cacheVersion !== '2026-04') {
+      localStorage.removeItem(CACHE_KEY);
+      localStorage.removeItem(CACHE_EXPIRY_KEY);
+      localStorage.setItem('peelr-cache-version', '2026-04');
+    }
+
     const cached = localStorage.getItem(CACHE_KEY);
     const expiry = localStorage.getItem(CACHE_EXPIRY_KEY);
-    
+
     if (cached && expiry && Date.now() < parseInt(expiry)) {
       const data = JSON.parse(cached);
       applyFetchedQuestions(data);
