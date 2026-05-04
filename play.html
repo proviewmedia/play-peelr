@@ -2988,10 +2988,10 @@ async function fetchQuestionsFromSupabase() {
   try {
     // Clear old cache on new version
     const cacheVersion = localStorage.getItem('peelr-cache-version');
-    if (cacheVersion !== '2026-04') {
+    if (cacheVersion !== '2026-05') {
       localStorage.removeItem(CACHE_KEY);
       localStorage.removeItem(CACHE_EXPIRY_KEY);
-      localStorage.setItem('peelr-cache-version', '2026-04');
+      localStorage.setItem('peelr-cache-version', '2026-05');
     }
 
     const cached = localStorage.getItem(CACHE_KEY);
