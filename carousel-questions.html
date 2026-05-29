@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Peelr Carousel - Questions That Hit Different</title>
+<style>
+body { margin: 0; background: #1a1a1a; display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center; }
+canvas { border: 1px solid #333; max-width: 360px; height: auto; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<script>
+const W = 1080, H = 1350;
+const BG = '#0B0A0A';
+const GOLD = '#D4AF77';
+const CREAM = '#F5F0E8';
+const MUTED = '#8A8478';
+const DIM = '#5A564E';
+
+function waitForFont() {
+  return document.fonts.load('400 48px "Josefin Sans"').then(() => {
+    return document.fonts.load('700 48px "Josefin Sans"');
+  });
+}
+
+function drawRoundedRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function drawLogo(ctx, y) {
+  ctx.font = '300 28px "Josefin Sans"';
+  ctx.fillStyle = GOLD;
+  ctx.textAlign = 'center';
+  ctx.fillText('P E E L R', W / 2, y);
+}
+
+function drawDots(ctx, activeIndex, total, y) {
+  const dotR = 6;
+  const gap = 28;
+  const startX = W / 2 - ((total - 1) * gap) / 2;
+  for (let i = 0; i < total; i++) {
+    ctx.beginPath();
+    ctx.arc(startX + i * gap, y, dotR, 0, Math.PI * 2);
+    ctx.fillStyle = i === activeIndex ? GOLD : DIM;
+    ctx.fill();
+  }
+}
+
+function wrapTextCentered(ctx, text, x, y, maxWidth, lineHeight) {
+  const words = text.split(' ');
+  let line = '';
+  let lines = [];
+  for (let w of words) {
+    let test = line + w + ' ';
+    if (ctx.measureText(test).width > maxWidth && line !== '') {
+      lines.push(line.trim());
+      line = w + ' ';
+    } else {
+      line = test;
+    }
+  }
+  lines.push(line.trim());
+  const totalH = lines.length * lineHeight;
+  const startY = y - totalH / 2 + lineHeight / 2;
+  for (let i = 0; i < lines.length; i++) {
+    ctx.fillText(lines[i], x, startY + i * lineHeight);
+  }
+  return lines.length;
+}
+
+function drawQuestionCard(ctx, deckName, question) {
+  const cardW = 800;
+  const cardH = 700;
+  const cardX = (W - cardW) / 2;
+  const cardY = 320;
+  const r = 40;
+
+  // Card background - subtle dark card
+  drawRoundedRect(ctx, cardX, cardY, cardW, cardH, r);
+  ctx.fillStyle = '#151414';
+  ctx.fill();
+  ctx.strokeStyle = GOLD;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Deck label at top of card
+  ctx.font = '300 24px "Josefin Sans"';
+  ctx.fillStyle = GOLD;
+  ctx.textAlign = 'center';
+  ctx.fillText(deckName.toUpperCase(), W / 2, cardY + 60);
+
+  // Decorative line
+  ctx.strokeStyle = DIM;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(W / 2 - 60, cardY + 80);
+  ctx.lineTo(W / 2 + 60, cardY + 80);
+  ctx.stroke();
+
+  // Question text
+  ctx.font = '400 42px "Josefin Sans"';
+  ctx.fillStyle = CREAM;
+  ctx.textAlign = 'center';
+  wrapTextCentered(ctx, '"' + question + '"', W / 2, cardY + cardH / 2 + 30, cardW - 120, 58);
+
+  // P E E L R at bottom of card
+  ctx.font = '300 20px "Josefin Sans"';
+  ctx.fillStyle = DIM;
+  ctx.fillText('P E E L R', W / 2, cardY + cardH - 40);
+}
+
+function createSlide(index) {
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, W, H);
+  drawLogo(ctx, 80);
+  drawDots(ctx, index, 5, H - 90);
+
+  if (index === 0) {
+    // Slide 1: Headline
+    ctx.textAlign = 'center';
+
+    ctx.strokeStyle = GOLD;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(W / 2 - 140, 400);
+    ctx.lineTo(W / 2 + 140, 400);
+    ctx.stroke();
+
+    ctx.font = '700 76px "Josefin Sans"';
+    ctx.fillStyle = CREAM;
+    ctx.fillText('Questions', W / 2, 510);
+    ctx.fillText('That Hit', W / 2, 600);
+    ctx.fillStyle = GOLD;
+    ctx.font = '700 84px "Josefin Sans"';
+    ctx.fillText('Different', W / 2, 700);
+
+    ctx.strokeStyle = GOLD;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(W / 2 - 140, 750);
+    ctx.lineTo(W / 2 + 140, 750);
+    ctx.stroke();
+
+    ctx.font = '300 30px "Josefin Sans"';
+    ctx.fillStyle = MUTED;
+    ctx.fillText('Real conversations start here', W / 2, 830);
+
+  } else if (index === 1) {
+    // Slide 2: Friends question
+    ctx.textAlign = 'center';
+    ctx.font = '600 30px "Josefin Sans"';
+    ctx.fillStyle = MUTED;
+    ctx.fillText('FROM THE FRIENDS DECK', W / 2, 220);
+
+    drawQuestionCard(ctx, 'Friends', 'What is something you pretend to be okay with but actually are not?');
+
+  } else if (index === 2) {
+    // Slide 3: Lovers question
+    ctx.textAlign = 'center';
+    ctx.font = '600 30px "Josefin Sans"';
+    ctx.fillStyle = MUTED;
+    ctx.fillText('FROM THE LOVERS DECK', W / 2, 220);
+
+    drawQuestionCard(ctx, 'Lovers', 'What do you need from me that you have never asked for?');
+
+  } else if (index === 3) {
+    // Slide 4: Family question
+    ctx.textAlign = 'center';
+    ctx.font = '600 30px "Josefin Sans"';
+    ctx.fillStyle = MUTED;
+    ctx.fillText('FROM THE FAMILY DECK', W / 2, 220);
+
+    drawQuestionCard(ctx, 'Family', 'What is something you wish you had said to a family member sooner?');
+
+  } else if (index === 4) {
+    // Slide 5: CTA
+    ctx.textAlign = 'center';
+
+    ctx.font = '700 180px "Josefin Sans"';
+    ctx.fillStyle = GOLD;
+    ctx.fillText('500+', W / 2, 520);
+
+    ctx.font = '400 40px "Josefin Sans"';
+    ctx.fillStyle = CREAM;
+    ctx.fillText('questions like these', W / 2, 590);
+
+    ctx.strokeStyle = DIM;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(W / 2 - 80, 640);
+    ctx.lineTo(W / 2 + 80, 640);
+    ctx.stroke();
+
+    ctx.font = '300 32px "Josefin Sans"';
+    ctx.fillStyle = MUTED;
+    ctx.fillText('Across 5 decks and 5 depth layers', W / 2, 700);
+
+    // CTA button
+    drawRoundedRect(ctx, 270, 780, W - 540, 80, 40);
+    ctx.fillStyle = GOLD;
+    ctx.fill();
+    ctx.font = '700 34px "Josefin Sans"';
+    ctx.fillStyle = BG;
+    ctx.textAlign = 'center';
+    ctx.fillText('playpeelr.com', W / 2, 830);
+
+    ctx.font = '300 26px "Josefin Sans"';
+    ctx.fillStyle = MUTED;
+    ctx.fillText('Try Layer 1 free. No account needed.', W / 2, 910);
+  }
+
+  document.body.appendChild(c);
+  return c;
+}
+
+waitForFont().then(() => {
+  const canvases = [];
+  for (let i = 0; i < 5; i++) {
+    canvases.push(createSlide(i));
+  }
+  setTimeout(() => {
+    canvases.forEach((c, i) => {
+      const link = document.createElement('a');
+      link.download = 'peelr-questions-slide-' + (i + 1) + '.png';
+      link.href = c.toDataURL('image/png');
+      link.click();
+    });
+  }, 500);
+});
+</script>
+</body>
+</html>

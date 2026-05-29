@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Peelr Carousel - How It Works</title>
+<style>
+body { margin: 0; background: #1a1a1a; display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center; }
+canvas { border: 1px solid #333; max-width: 360px; height: auto; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<script>
+const W = 1080, H = 1350;
+const BG = '#0B0A0A';
+const GOLD = '#D4AF77';
+const CREAM = '#F5F0E8';
+const MUTED = '#8A8478';
+const DIM = '#5A564E';
+
+function waitForFont() {
+  return document.fonts.load('400 48px "Josefin Sans"').then(() => {
+    return document.fonts.load('700 48px "Josefin Sans"');
+  });
+}
+
+function drawRoundedRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function drawLogo(ctx, y) {
+  ctx.font = '300 28px "Josefin Sans"';
+  ctx.fillStyle = GOLD;
+  ctx.textAlign = 'center';
+  ctx.fillText('P E E L R', W / 2, y);
+}
+
+function drawDots(ctx, activeIndex, total, y) {
+  const dotR = 6;
+  const gap = 28;
+  const startX = W / 2 - ((total - 1) * gap) / 2;
+  for (let i = 0; i < total; i++) {
+    ctx.beginPath();
+    ctx.arc(startX + i * gap, y, dotR, 0, Math.PI * 2);
+    ctx.fillStyle = i === activeIndex ? GOLD : DIM;
+    ctx.fill();
+  }
+}
+
+function wrapTextCentered(ctx, text, x, y, maxWidth, lineHeight) {
+  const words = text.split(' ');
+  let line = '';
+  let lines = [];
+  for (let w of words) {
+    let test = line + w + ' ';
+    if (ctx.measureText(test).width > maxWidth && line !== '') {
+      lines.push(line.trim());
+      line = w + ' ';
+    } else {
+      line = test;
+    }
+  }
+  lines.push(line.trim());
+  const totalH = lines.length * lineHeight;
+  const startY = y - totalH / 2 + lineHeight / 2;
+  for (let i = 0; i < lines.length; i++) {
+    ctx.fillText(lines[i], x, startY + i * lineHeight);
+  }
+  return lines.length;
+}
+
+function drawStepNumber(ctx, num, x, y) {
+  // Gold circle with step number
+  ctx.beginPath();
+  ctx.arc(x, y, 50, 0, Math.PI * 2);
+  ctx.fillStyle = GOLD;
+  ctx.fill();
+  ctx.font = '700 42px "Josefin Sans"';
+  ctx.fillStyle = BG;
+  ctx.textAlign = 'center';
+  ctx.fillText(num, x, y + 15);
+}
+
+function createSlide(index) {
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, W, H);
+  drawLogo(ctx, 80);
+  drawDots(ctx, index, 5, H - 90);
+
+  if (index === 0) {
+    // Slide 1: How to Play headline
+    ctx.textAlign = 'center';
+
+    ctx.strokeStyle = GOLD;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(W / 2 - 120, 400);
+    ctx.lineTo(W / 2 + 120, 400);
+    ctx.stroke();
+
+    ctx.font = '700 82px "Josefin Sans"';
+    ctx.fillStyle = CREAM;
+    ctx.fillText('How to Play', W / 2, 530);
+    ctx.fillStyle = GOLD;
+    ctx.font = '700 92px "Josefin Sans"';
+    ctx.fillText('Peelr', W / 2, 640);
+
+    ctx.strokeStyle = GOLD;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(W / 2 - 120, 690);
+    ctx.lineTo(W / 2 + 120, 690);
+    ctx.stroke();
+
+    ctx.font = '300 38px "Josefin Sans"';
+    ctx.fillStyle = MUTED;
+    ctx.fillText('3 simple steps', W / 2, 780);
+
+  } else if (index === 1) {
+    // Slide 2: Step 1 - Pick Your Deck
+    drawStepNumber(ctx, '1', W / 2, 220);
+
+    ctx.textAlign = 'center';
+    ctx.font = '700 64px "Josefin Sans"';
+    ctx.fillStyle = CREAM;
+    ctx.fillText('Pick Your', W / 2, 360);
+    ctx.fillStyle = GOLD;
+    ctx.fillText('Deck', W / 2, 435);
+
+    const decks = ['Friends', 'Family', 'Lovers', 'Coworkers', 'Strangers'];
+    const startY = 550;
+    const gap = 100;
+
+    decks.forEach((deck, i) => {
+      const y = startY + i * gap;
+      // Pill shape
+      drawRoundedRect(ctx, 280, y - 30, W - 560, 60, 30);
+      ctx.strokeStyle = GOLD;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.font = '400 32px "Josefin Sans"';
+      ctx.fillStyle = CREAM;
+      ctx.textAlign = 'center';
+      ctx.fillText(deck, W / 2, y + 10);
+    });
+
+  } else if (index === 2) {
+    // Slide 3: Step 2 - Choose Your Depth
+    drawStepNumber(ctx, '2', W / 2, 220);
+
+    ctx.textAlign = 'center';
+    ctx.font = '700 64px "Josefin Sans"';
+    ctx.fillStyle = CREAM;
+    ctx.fillText('Choose Your', W / 2, 360);
+    ctx.fillStyle = GOLD;
+    ctx.fillText('Depth', W / 2, 435);
+
+    const layers = [
+      { num: '1', label: 'Surface' },
+      { num: '2', label: 'Curious' },
+      { num: '3', label: 'Open' },
+      { num: '4', label: 'Vulnerable' },
+      { num: '5', label: 'Soul' },
+    ];
+
+    const startY = 560;
+    const gap = 100;
+
+    layers.forEach((layer, i) => {
+      const y = startY + i * gap;
+      const barWidth = 200 + i * 100;
+      const barX = (W - barWidth) / 2;
+      const alpha = 0.25 + (i * 0.19);
+
+      // Growing bars
+      drawRoundedRect(ctx, barX, y - 28, barWidth, 56, 28);
+      ctx.fillStyle = `rgba(212, 175, 119, ${alpha})`;
+      ctx.fill();
+
+      // Number and label
+      ctx.font = '600 28px "Josefin Sans"';
+      ctx.fillStyle = CREAM;
+      ctx.textAlign = 'center';
+      ctx.fillText(layer.num + '  ' + layer.label, W / 2, y + 10);
+    });
+
+    // Free vs premium note
+    ctx.font = '300 24px "Josefin Sans"';
+    ctx.fillStyle = DIM;
+    ctx.textAlign = 'center';
+    ctx.fillText('Layer 1 free  |  Layers 2-5 premium', W / 2, startY + 5 * gap + 30);
+
+  } else if (index === 3) {
+    // Slide 4: Step 3 - Start Peeling
+    drawStepNumber(ctx, '3', W / 2, 200);
+
+    ctx.textAlign = 'center';
+    ctx.font = '700 64px "Josefin Sans"';
+    ctx.fillStyle = CREAM;
+    ctx.fillText('Start', W / 2, 340);
+    ctx.fillStyle = GOLD;
+    ctx.fillText('Peeling', W / 2, 415);
+
+    // Sample question card
+    const cardW = 750;
+    const cardH = 500;
+    const cardX = (W - cardW) / 2;
+    const cardY = 500;
+    const r = 36;
+
+    drawRoundedRect(ctx, cardX, cardY, cardW, cardH, r);
+    ctx.fillStyle = '#151414';
+    ctx.fill();
+    ctx.strokeStyle = GOLD;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Deck label
+    ctx.font = '300 22px "Josefin Sans"';
+    ctx.fillStyle = GOLD;
+    ctx.textAlign = 'center';
+    ctx.fillText('FRIENDS  |  LAYER 3', W / 2, cardY + 55);
+
+    // Line
+    ctx.strokeStyle = DIM;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(W / 2 - 50, cardY + 75);
+    ctx.lineTo(W / 2 + 50, cardY + 75);
+    ctx.stroke();
+
+    // Question
+    ctx.font = '400 36px "Josefin Sans"';
+    ctx.fillStyle = CREAM;
+    wrapTextCentered(ctx, '"When was the last time you felt truly seen by someone?"', W / 2, cardY + cardH / 2 + 30, cardW - 100, 52);
+
+    // Bottom logo on card
+    ctx.font = '300 18px "Josefin Sans"';
+    ctx.fillStyle = DIM;
+    ctx.fillText('P E E L R', W / 2, cardY + cardH - 35);
+
+  } else if (index === 4) {
+    // Slide 5: CTA
+    ctx.textAlign = 'center';
+
+    ctx.font = '400 36px "Josefin Sans"';
+    ctx.fillStyle = CREAM;
+    ctx.fillText('No account.', W / 2, 420);
+    ctx.fillText('No ads.', W / 2, 475);
+
+    ctx.font = '700 50px "Josefin Sans"';
+    ctx.fillStyle = GOLD;
+    ctx.fillText('Just real questions.', W / 2, 570);
+
+    // Decorative line
+    ctx.strokeStyle = GOLD;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(W / 2 - 100, 620);
+    ctx.lineTo(W / 2 + 100, 620);
+    ctx.stroke();
+
+    ctx.font = '300 30px "Josefin Sans"';
+    ctx.fillStyle = MUTED;
+    ctx.fillText('Try Layer 1 free', W / 2, 690);
+    ctx.fillText('500+ questions across 5 decks', W / 2, 735);
+
+    // CTA button
+    drawRoundedRect(ctx, 270, 810, W - 540, 80, 40);
+    ctx.fillStyle = GOLD;
+    ctx.fill();
+    ctx.font = '700 34px "Josefin Sans"';
+    ctx.fillStyle = BG;
+    ctx.textAlign = 'center';
+    ctx.fillText('playpeelr.com', W / 2, 860);
+
+    ctx.font = '300 26px "Josefin Sans"';
+    ctx.fillStyle = DIM;
+    ctx.fillText('Available on the App Store', W / 2, 940);
+  }
+
+  document.body.appendChild(c);
+  return c;
+}
+
+waitForFont().then(() => {
+  const canvases = [];
+  for (let i = 0; i < 5; i++) {
+    canvases.push(createSlide(i));
+  }
+  setTimeout(() => {
+    canvases.forEach((c, i) => {
+      const link = document.createElement('a');
+      link.download = 'peelr-how-it-works-slide-' + (i + 1) + '.png';
+      link.href = c.toDataURL('image/png');
+      link.click();
+    });
+  }, 500);
+});
+</script>
+</body>
+</html>
