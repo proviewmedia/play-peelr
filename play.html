@@ -1266,6 +1266,11 @@ body.modern .sponsored-cta {
         </select>
       </div>
       
+      <div id="settings-subscription-wrap" style="display:none">
+        <div style="font-size:10px;font-weight:600;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold);margin-top:32px;margin-bottom:16px" data-i18n="settings-subscription">SUBSCRIPTION</div>
+        <div id="subscription-box" style="padding:4px 0 4px 0;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:24px"></div>
+      </div>
+
       <div style="margin-top:40px;text-align:center;font-size:12px;color:var(--dim)">
         <a onclick="showScreen('changelog')" style="color:var(--dim);text-decoration:none;cursor:pointer;transition:color 0.3s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--dim)'">Version 1.0.3 ›</a>
       </div>
@@ -2696,6 +2701,7 @@ const TRANSLATIONS = {
     'settings-theme-modern-desc': 'Clean & bold',
     'settings-language': 'LANGUAGE',
     'settings-language-label': 'Language',
+    'settings-subscription': 'SUBSCRIPTION',
     
     // How to Play
     'how-title': 'How to Peel',
@@ -2842,6 +2848,7 @@ const TRANSLATIONS = {
     'settings-dark-mode': 'Modo Oscuro',
     'settings-language': 'IDIOMA',
     'settings-language-label': 'Idioma',
+    'settings-subscription': 'SUSCRIPCIÓN',
     
     // How to Play
     'how-title': 'Cómo Pelar',
@@ -3925,6 +3932,7 @@ function changeLanguage(lang) {
   
   // Update dynamic content that is not using data-i18n
   updateDynamicTranslations();
+  renderSubscriptionSettings();
 }
 
 function updateDynamicTranslations() {
@@ -4216,9 +4224,138 @@ function showPurchaseSuccess(tier) {
   setTimeout(() => toast.remove(), 4000);
 }
 
+// ---- Subscription management (web monthly subscribers) ----
+const BILLING_PORTAL_URL = SUPABASE_URL + '/functions/v1/billing-portal';
+const CHECK_STATUS_URL = SUPABASE_URL + '/functions/v1/check-status';
+// Stripe-hosted Customer Portal login page (email magic-link) for subscribers
+// on a different device or who cleared their browser. Paste the login URL from
+// Stripe Dashboard → Settings → Billing → Customer portal. Leave '' to hide it.
+const BILLING_PORTAL_LOGIN_URL = 'https://billing.stripe.com/p/login/5kQaEQ5S61E9a8Dd683ZK00';
+
+const SUB_T = {
+  en: {
+    monthly: 'Peelr Premium · Monthly',
+    lifetime: 'Peelr Lifetime',
+    lifetimeNote: 'Unlocked forever. Thank you.',
+    manage: 'Manage / Cancel subscription',
+    opening: 'Opening…',
+    otherDevice: 'On another device? Manage your subscription →',
+    contact: 'To cancel, email support@playpeelr.com',
+    ended: 'Your Peelr Premium subscription has ended.',
+    error: 'Could not open the billing page. Please email support@playpeelr.com.'
+  },
+  es: {
+    monthly: 'Peelr Premium · Mensual',
+    lifetime: 'Peelr de por vida',
+    lifetimeNote: 'Desbloqueado para siempre. Gracias.',
+    manage: 'Administrar / Cancelar suscripción',
+    opening: 'Abriendo…',
+    otherDevice: '¿En otro dispositivo? Administra tu suscripción →',
+    contact: 'Para cancelar, escribe a support@playpeelr.com',
+    ended: 'Tu suscripción a Peelr Premium ha finalizado.',
+    error: 'No se pudo abrir la página de facturación. Escribe a support@playpeelr.com.'
+  }
+};
+function subT(k) { return (SUB_T[currentLanguage] || SUB_T.en)[k]; }
+
+function renderSubscriptionSettings() {
+  const wrap = document.getElementById('settings-subscription-wrap');
+  const box = document.getElementById('subscription-box');
+  if (!wrap || !box) return;
+  const tier = getTier();
+  if (tier === 'monthly') {
+    wrap.style.display = 'block';
+    let html = '<div style="font-size:14px;color:var(--cream);margin-bottom:14px">' + subT('monthly') + '</div>';
+    html += '<button id="manage-sub-btn" onclick="manageSubscription()" style="width:100%;padding:14px;background:transparent;border:1px solid var(--gold);color:var(--gold);border-radius:10px;font-size:14px;font-weight:500;font-family:inherit;cursor:pointer">' + subT('manage') + '</button>';
+    if (BILLING_PORTAL_LOGIN_URL) {
+      html += '<div style="margin-top:14px;text-align:center;font-size:12px"><a href="' + BILLING_PORTAL_LOGIN_URL + '" target="_blank" rel="noopener" style="color:var(--dim);text-decoration:none">' + subT('otherDevice') + '</a></div>';
+    }
+    box.innerHTML = html;
+  } else if (tier === 'lifetime' || tier === 'master') {
+    wrap.style.display = 'block';
+    box.innerHTML = '<div style="font-size:14px;color:var(--cream)">' + subT('lifetime') + '</div>' +
+      '<div style="font-size:12px;color:var(--dim);margin-top:6px">' + subT('lifetimeNote') + '</div>';
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
+async function manageSubscription() {
+  const btn = document.getElementById('manage-sub-btn');
+  let code = null;
+  try { code = localStorage.getItem('peelr-code'); } catch(e) {}
+  if (!code) {
+    if (BILLING_PORTAL_LOGIN_URL) { window.open(BILLING_PORTAL_LOGIN_URL, '_blank', 'noopener'); }
+    else { alert(subT('contact')); }
+    return;
+  }
+  if (btn) { btn.disabled = true; btn.textContent = subT('opening'); }
+  try {
+    const res = await fetch(BILLING_PORTAL_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
+      body: JSON.stringify({ session_id: code }),
+    });
+    const data = await res.json();
+    if (res.ok && data.url) {
+      gtag('event', 'manage_subscription_open');
+      window.location.href = data.url;
+    } else {
+      alert(subT('error'));
+      if (btn) { btn.disabled = false; btn.textContent = subT('manage'); }
+    }
+  } catch (err) {
+    console.error('billing portal failed', err);
+    alert(subT('error'));
+    if (btn) { btn.disabled = false; btn.textContent = subT('manage'); }
+  }
+}
+
+// Re-validate a monthly grant against Stripe at most once per day. Fails open
+// on network errors so paying users are never locked out by a transient blip.
+async function revalidateSubscription() {
+  if (getTier() !== 'monthly') return;
+  let code = null, last = 0;
+  try {
+    code = localStorage.getItem('peelr-code');
+    last = parseInt(localStorage.getItem('peelr-last-check') || '0', 10);
+  } catch (e) { return; }
+  if (!code) return;
+  if (Date.now() - last < 24 * 60 * 60 * 1000) return;
+  try {
+    const res = await fetch(CHECK_STATUS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
+      body: JSON.stringify({ session_id: code }),
+    });
+    const data = await res.json();
+    if (!res.ok || typeof data.active === 'undefined') return; // fail open
+    try { localStorage.setItem('peelr-last-check', String(Date.now())); } catch (e) {}
+    if (data.active === false) {
+      try {
+        localStorage.removeItem('peelr-unlocked');
+        localStorage.removeItem('peelr-tier');
+        localStorage.removeItem('peelr-code');
+      } catch (e) {}
+      updateLockIcons();
+      renderSubscriptionSettings();
+      gtag('event', 'subscription_expired_relock');
+      const toast = document.createElement('div');
+      toast.style.cssText = 'position:fixed;top:24px;left:50%;transform:translateX(-50%);background:var(--surface);color:var(--cream);padding:16px 24px;border-radius:12px;font-weight:500;z-index:30000;box-shadow:0 8px 24px rgba(0,0,0,0.4);font-family:inherit;font-size:14px;border:1px solid var(--gold)';
+      toast.textContent = subT('ended');
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 5000);
+    }
+  } catch (err) {
+    // fail open — never lock out a paying user on a transient error
+  }
+}
+
 // On load, check unlock status + handle any Stripe redirect
 updateLockIcons();
 handleStripeRedirect();
+renderSubscriptionSettings();
+revalidateSubscription();
 </script>
 <!-- CODE REVEAL MODAL -->
 <div id="code-modal" style="
