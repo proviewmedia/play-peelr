@@ -640,6 +640,27 @@ body.light-mode .sponsored-card {
     max-width: 360px;
   }
 }
+/* LANDSCAPE on short screens (phones held sideways): reshape the portrait
+   card into a wider, height-filling card so the question text never clips */
+@media (orientation: landscape) and (max-height: 600px) {
+  .header { padding: 10px 24px; }
+  .footer { padding: 9px 24px; }
+  .card-area { padding: 10px 24px; gap: 8px; }
+  .card-container { max-width: 600px; }
+  .question-card {
+    aspect-ratio: auto;
+    height: calc(100dvh - 132px);
+    max-height: none;
+    padding: 16px 32px;
+  }
+  .card-header { margin-bottom: 4px; }
+  .question-text { font-size: 18px; line-height: 1.45; padding: 10px 0; }
+  .card-navigation { max-width: 600px; gap: 14px; }
+  .nav-arrow { width: 40px; height: 40px; font-size: 18px; }
+  .question-counter { margin-top: 4px; }
+  /* keep list screens comfortably scrollable in landscape */
+  .content-area { padding-top: 12px; padding-bottom: 12px; }
+}
 /* MODERN THEME */
 body.modern {
   --bg: #F2F2F7;
