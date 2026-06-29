@@ -646,11 +646,13 @@ body.light-mode .sponsored-card {
   .header { padding: 10px 24px; }
   .footer { padding: 9px 24px; }
   .card-area { padding: 10px 24px; gap: 8px; }
-  .card-container { max-width: 600px; }
+  .card-container { max-width: 520px; }
   .question-card {
     aspect-ratio: auto;
     height: calc(100dvh - 132px);
     max-height: none;
+    max-width: 520px;   /* override the 768px rule; let long questions use the width */
+    margin: 0 auto;     /* keep the card centered */
     padding: 16px 32px;
   }
   .card-header { margin-bottom: 4px; }
@@ -3389,12 +3391,14 @@ function setupSwipe() {
     isDragging = false;
     const diff = currentX - startX;
     
-    if (Math.abs(diff) > 100) {
+    const goingBack = diff > 0;
+    // Can't go back past the first card — snap back instead of flinging it away
+    if (Math.abs(diff) > 100 && !(goingBack && currentIndex === 0)) {
       // Swipe completed
       card.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
       card.style.transform = `translateX(${diff > 0 ? 1000 : -1000}px) rotate(${diff > 0 ? 45 : -45}deg)`;
       card.style.opacity = 0;
-      
+
       setTimeout(() => {
         if (diff > 0) {
           // Swiped right - go back
