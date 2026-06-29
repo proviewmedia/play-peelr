@@ -662,6 +662,13 @@ body.light-mode .sponsored-card {
   .question-counter { margin-top: 4px; }
   /* keep list screens comfortably scrollable in landscape */
   .content-area { padding-top: 12px; padding-bottom: 12px; }
+  /* HOME: let the badge/tagline flow above the Play button instead of being
+     absolutely positioned on top of it (was overlapping in landscape) */
+  #home .content { padding-top: 14px; justify-content: center; gap: 18px; }
+  .top-content { position: static; top: auto; }
+  .badge { margin-bottom: 8px; }
+  .tagline { font-size: 17px; max-width: 460px; }
+  .play-button { width: 96px; height: 96px; font-size: 26px; }
 }
 /* MODERN THEME */
 body.modern {
