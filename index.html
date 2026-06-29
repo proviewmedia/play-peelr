@@ -235,7 +235,7 @@ footer{padding:64px 0 36px}
   .hero-sub{margin-left:auto;margin-right:auto}
   .hero-btns{justify-content:center}
   .hero-stats{justify-content:center}
-  .hero-visual{order:-1;margin-top:12px;width:100%;overflow:visible}
+  .hero-visual{margin-top:4px;width:100%;overflow:visible}
   .q-card{position:relative;transform:rotate(0deg);width:min(330px,80vw);margin:0 auto}
   .q-card.behind{transform:rotate(-4deg) translate(-12px,8px) scale(0.94)}
   .eyebrow{justify-content:center}
@@ -252,6 +252,14 @@ footer{padding:64px 0 36px}
   .nav-links.open{display:flex}
   .nav-burger{display:flex}
   .why{grid-template-columns:1fr}
+  /* How It Works: drop the fixed-width depth bar (was crushing the layer names)
+     and tighten rows so the section isn't so tall on phones */
+  .depth-wrap{gap:28px}
+  .step{padding:14px 0}
+  .layers{padding:6px 20px}
+  .layer{gap:12px;padding:13px 0}
+  .layer-track{display:none}
+  .layer-n{width:26px;font-size:22px}
 }
 @media(max-width:560px){
   .bento{grid-template-columns:1fr}
